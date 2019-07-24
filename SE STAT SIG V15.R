@@ -50,15 +50,15 @@ plot(siz)
 plot(regions)
 
 
-
 ## Load piz and siz from AWS and save as shapefiles for use when not connected to AWS
 writeOGR(obj=piz, ".", layer="DATA/piz2", driver="ESRI Shapefile") #dsn=td,
 writeOGR(obj=siz, ".", layer="DATA/siz2", driver="ESRI Shapefile") #dsn=td,
+writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=td,
 
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
-
+regions<-readOGR("DATA/regions2.shp")
 
 
 #### IMPORT MONITORING DATA ####
