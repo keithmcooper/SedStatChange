@@ -48,13 +48,18 @@ siz <- st_read_db(con, query =  "select  * from ma_tool.extraction_areas_siz", g
 plot(piz)
 plot(siz)
 plot(regions)
-###################
-class(piz)
-writeOGR(obj=piz, ".", layer="DATA/piz2", driver="ESRI Shapefile") #dsn=td,
 
-piz3<-readOGR("DATA/piz2") 
-plot(piz3#
-#################
+
+
+## Load piz and siz from AWS and save as shapefiles for use when not connected to AWS
+writeOGR(obj=piz, ".", layer="DATA/piz2", driver="ESRI Shapefile") #dsn=td,
+writeOGR(obj=siz, ".", layer="DATA/siz2", driver="ESRI Shapefile") #dsn=td,
+
+## Load piz and siz fromm DATA folder
+piz<-readOGR("DATA/piz2.shp")
+siz<-readOGR("DATA/siz2.shp") 
+
+
 
 #### IMPORT MONITORING DATA ####
 ## Load SC monitoring data
