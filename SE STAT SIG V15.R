@@ -48,7 +48,13 @@ siz <- st_read_db(con, query =  "select  * from ma_tool.extraction_areas_siz", g
 plot(piz)
 plot(siz)
 plot(regions)
+###################
+class(piz)
+writeOGR(obj=piz, ".", layer="DATA/piz2", driver="ESRI Shapefile") #dsn=td,
 
+piz3<-readOGR("DATA/piz2") 
+plot(piz3#
+#################
 
 #### IMPORT MONITORING DATA ####
 ## Load SC monitoring data
