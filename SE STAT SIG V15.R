@@ -14,7 +14,7 @@ library(rgdal)
 library(maptools)
 library(plyr)
 
-#### IMPORT POLYGONS ####
+#### IMPORT POLYGONS FROM AWS ####
 #install.packages("RPostgreSQL")
 require("RPostgreSQL")
 
@@ -36,7 +36,6 @@ rm(pw) # removes the password
 ## See list of tables
 dbListTables(con)
 
-
 regions <- st_read_db(con, query =  "select region, region_name, area_shape_km2 , geom from ma_tool.extraction_regions", geom_column = 'geom' ) %>% as( "Spatial") 
 
 piz <- st_read_db(con, query =  "select * from ma_tool.extraction_areas", geom_column = 'geom' ) %>% as( "Spatial") 
@@ -49,27 +48,31 @@ plot(piz)
 plot(siz)
 plot(regions)
 
-##############################################
-names(regions)
-names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
-names(siz)=c("fid","gid","gid_piz","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
-names(regions)=c("region","region_name","area_shape_km2")
-##############################################
 ## Load piz and siz from AWS and save as shapefiles for use when not connected to AWS
 writeOGR(obj=piz, ".", layer="DATA/piz2", driver="ESRI Shapefile") #dsn=td,
 writeOGR(obj=siz, ".", layer="DATA/siz2", driver="ESRI Shapefile") #dsn=td,
 writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=td,
 
+
+
+#### IMPORT POLYGONS FROM DATA FOLDER ####
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
 regions<-readOGR("DATA/regions2.shp")
+
+## Reinstate full column names (these are lost in the writeOGR step)
+names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
+names(siz)=c("fid","gid","gid_piz","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
+names(regions)=c("region","region_name","area_shape_km2")
+
 plot(piz)
 plot(siz)
 plot(regions)
 
+
 #### IMPORT MONITORING DATA ####
-## Load SC monitoring data
+## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
 mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 mondat
 dim(mondat) #550 10
@@ -85,6 +88,8 @@ colnames(mondat)[1] <- "Code"
 pts_m=SpatialPoints(mondat[,(10:9)], 
                   proj4string = CRS(proj4string(piz)))
 
+
+
 #### PIZ MONITORING DATA ####
 ## Plot monitoring data points on PIZ polygons
 plot(piz, axes = TRUE)
@@ -95,7 +100,7 @@ mondat2=over(pts_m, piz)
 #View(mondat2)
 mondat3=cbind(mondat,mondat2)
 #View(mondat3)
-dim(mondat3a)#550 20
+dim(mondat3)#550 20
 
 ## Remove any samples not within a PIZ
 mondat4=mondat3[!is.na(mondat3$area_numbe),]
