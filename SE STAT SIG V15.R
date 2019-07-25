@@ -194,12 +194,12 @@ data3$site=as.factor(data3$site)
 data3$time=as.factor(data3$time)
 #View(data3)
 ###################################################################
-## Creat a copy of df data3 to allow for calc of means by all sites
+## Create a copy of df data3 to allow for calc of means by all sites
 data3copy=data3
 
 ## Change all values in col 'site' to 'all'
-data3copy$site <- "all"
-View(data4copy)
+data3copy$site <- "All"
+View(data3copy)
 
 ## Now join df for site piz samples together with df for all piz samples
 data4 <- rbind(data3,data3copy)
@@ -243,7 +243,7 @@ table(site)
 site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ",
                "395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ",
                "435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ",
-               "488 PIZ", "500/3 PIZ","all")
+               "488 PIZ", "500/3 PIZ","All")
 
 ## Number of sites
 nsites = length(site.names)# 17
@@ -318,8 +318,11 @@ colnames(piz_pvalues_means)=c("site","cG_p","mG_p","fG_p","cS_p","mS_p","fS_p","
 #View(piz_pvalues_means)
 names(piz_pvalues_means)
 
+## Get all to the top
+n_row=nrow(piz_pvalues_means)
+
 ## Get cols in sensible order
-piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
+piz_pvalues_means2=piz_pvalues_means[c(n_row,1:n_row-1),c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
 View(piz_pvalues_means2)
 
 ## Calculate change in sed fractions between baseline and monitoring
@@ -347,7 +350,92 @@ pizchange$fG_change=round(pizchange$fG_change,1)
 pizchange$mG_change=round(pizchange$mG_change,1)
 pizchange$cG_change=round(pizchange$cG_change,1)
 
+## Create a nice table
 
+pizchange2 <- pizchange
+colnames(pizchange2) <- c("Site", "n","SCp", "fSp", "mSp", "cSp", "fGp", "mGp", "cGp", "SC", "fS", "mS", "cS", "fG", "mG", "cG")
+#pizchange2 <- pizchange2[,c(1:2,10,3,11,4,12,5,13,6,14,7,15,8,16,9)]
+
+
+## pUT P-VALES IN BRACKETS
+#pizchange2[,4] <- paste0("(", format(unlist(pizchange2[,4])),")")
+#pizchange2[,6] <- paste0("(", format(unlist(pizchange2[,6])),")")
+#pizchange2[,8] <- paste0("(", format(unlist(pizchange2[,8])),")")
+#pizchange2[,10] <- paste0("(", format(unlist(pizchange2[,10])),")")
+#pizchange2[,12] <- paste0("(", format(unlist(pizchange2[,12])),")")
+#pizchange2[,14] <- paste0("(", format(unlist(pizchange2[,14])),")")
+#pizchange2[,16] <- paste0("(", format(unlist(pizchange2[,16])),")")
+#################################################################
+#### nICE TABLE FOR REPORTING PIZ DATA ####
+
+# https://cran.r-project.org/web/packages/flextable/vignettes/layout.html#manage-headers-and-footers
+library(flextable)
+library(officer)
+
+## This works
+#piztab <- flextable(pizchange2)
+#piztab
+
+#ft <- flextable(head(pizchange2))
+#class(pizchange2)
+#names(piztab)
+#piztab <- flextable(pizchange2,col_keys=c("Site", "n","SC(p)", "fS(p)", "mS(p)", "cS(p)", "fG(p)", "mG(p)", "cG(p)", "SC", "fS", "mS", "cS", "fG", "mG", "cG"))
+
+ft <- flextable(pizchange2,col_keys=c(
+                         "Site",
+                         "n",
+                         "SCp",
+                         "fSp",
+                         "mSp",
+                         "cSp",
+                         "fGp",
+                         "mGp",
+                         "cGp",
+                         "SC",
+                         "fS",
+                         "mS",
+                         "cS",
+                         "fG",
+                         "mG",
+                         "cG"))
+## Change row names
+ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
+
+## Add secondary header row
+ft <- add_header_row(ft, values=c("","","P-values","","","","","","","Change","","","","","",""),top=TRUE)
+
+## Add table description
+ft <- add_header_lines(ft,values=c("Table. 1. P-values and change in sediment composition by fraction between baseline and 2018 monitoring"))
+
+## Make header bold
+ft <- bold(ft,part="header")
+
+### align text
+ft <- align(ft,align="left", part="header")
+ft <- align(ft,align="left", part="body")
+
+##Change number of dp
+col_keys=c(
+  "Site",
+  "n",
+  "SCp",
+  "fSp",
+  "mSp",
+  "cSp",
+  "fGp",
+  "mGp",
+  "cGp",
+  "SC",
+  "fS",
+  "mS",
+  "cS",
+  "fG",
+  "mG",
+  "cG")
+ft <- colformat_num(ft,  col_keys = col_keys,digits = 2)
+
+
+ft
 
 
 
