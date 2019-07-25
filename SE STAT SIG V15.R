@@ -55,7 +55,7 @@ writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=
 
 
 
-#### IMPORT POLYGONS FROM DATA FOLDER ####
+#### 2. IMPORT POLYGONS FROM DATA FOLDER ####
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
@@ -71,7 +71,7 @@ plot(siz)
 plot(regions)
 
 
-#### IMPORT MONITORING DATA ####
+#### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
 mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 mondat
@@ -89,8 +89,7 @@ pts_m=SpatialPoints(mondat[,(10:9)],
                   proj4string = CRS(proj4string(piz)))
 
 
-
-#### PIZ MONITORING DATA ####
+#### 4. MONITORING DATA: PIZ ####
 ## Plot monitoring data points on PIZ polygons
 plot(piz, axes = TRUE)
 points(pts_m,col = "blue", cex = 0.4,pch=20)
@@ -114,7 +113,7 @@ plot(piz, axes = TRUE)
 points(pts_m2,col = "blue", cex = 0.4,pch=20)
 
 
-#### PIZ BASELINE DATA ####
+#### BASELINE DATA: PIZ ####
 ## Bring in  SC baseline data
 basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
@@ -165,6 +164,7 @@ dim(basdat5)# 203 20
 mondat5=mondat4 %>%
   filter(Code %in% basdat5$Code)
 mondat5
+dim(mondat5)
 #View(mondat2)
 
 ## Now join the baseline df to the monitoring df
@@ -193,13 +193,24 @@ str(data3)
 data3$site=as.factor(data3$site)
 data3$time=as.factor(data3$time)
 #View(data3)
+###################################################################
+## Creat a copy of df data3 to allow for calc of means by all sites
+data3copy=data3
 
+## Change all values in col 'site' to 'all'
+data3copy$site <- "all"
+View(data4copy)
+
+## Now join df for site piz samples together with df for all piz samples
+data4 <- rbind(data3,data3copy)
+
+##############################################################
 #### PIZ SED SUMMARY BASELINE/MONITORING ####
 ## Get summary data by area
 #library(plyr)
 detach("package:plyr", unload=TRUE) 
 #library(dplyr)
-sumdata=data3%>%
+sumdata=data4%>%
   group_by(site,time) %>%
   summarise(
     count = n(),
@@ -216,11 +227,14 @@ sumdata
 
 #### PIZ WILCOX TESTS ####
 ## Take relevant columns
-data4=data3[,c(10:9,2:8)]
-data4
+data5=data4[,c(10:9,2:8)]
+#View(data5)
+#####################################################
 
-## Creat a vector for site
-site = as.character(data4$site)
+
+#################################################
+## Create a vector for site
+site = as.character(data5$site)
 
 ## Identify the number of sites for each site
 table(site)
@@ -229,17 +243,17 @@ table(site)
 site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ",
                "395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ",
                "435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ",
-               "488 PIZ", "500/3 PIZ")
+               "488 PIZ", "500/3 PIZ","all")
 
 ## Number of sites
-nsites = length(site.names)# 16
+nsites = length(site.names)# 17
 
 ## Matrix for p-values
 pmatrix = matrix(999, ncol=7, nrow=nsites)
 
 ## You just do a loop over the N sites. Select out the rows for the jth site (j=1 to N) on each iteration of the loop. And then do the Wilcoxon tests for that site
 for (j in 1:nsites) {
-  use = data4[site==site.names[j],]
+  use = data5[site==site.names[j],]
   for (k in 3:9) {
     varb = use[,k][use$time=="b"]
     varm = use[,k][use$time=="m"]
@@ -307,6 +321,34 @@ names(piz_pvalues_means)
 ## Get cols in sensible order
 piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
 View(piz_pvalues_means2)
+
+## Calculate change in sed fractions between baseline and monitoring
+names(piz_pvalues_means2)
+piz_pvalues_means2$sc_change <- piz_pvalues_means2$sc_m-piz_pvalues_means2$sc_b
+piz_pvalues_means2$fS_change <- piz_pvalues_means2$fS_m-piz_pvalues_means2$fS_b
+piz_pvalues_means2$mS_change <- piz_pvalues_means2$mS_m-piz_pvalues_means2$mS_b
+piz_pvalues_means2$cS_change <- piz_pvalues_means2$cS_m-piz_pvalues_means2$cS_b
+piz_pvalues_means2$fG_change <- piz_pvalues_means2$fG_m-piz_pvalues_means2$fG_b
+piz_pvalues_means2$mG_change <- piz_pvalues_means2$mG_m-piz_pvalues_means2$mG_b
+piz_pvalues_means2$cG_change <- piz_pvalues_means2$cG_m-piz_pvalues_means2$cG_b
+
+## Take cols of interest: change and p-values
+pizchange <- piz_pvalues_means2[,c(1:9,24:30)]
+View(pizchange)
+
+
+
+## Round p-values to 3 dp
+pizchange$sc_change=round(pizchange$sc_change,1)
+pizchange$fS_change=round(pizchange$fS_change,1)
+pizchange$mS_change=round(pizchange$mS_change,1)
+pizchange$cS_change=round(pizchange$cS_change,1)
+pizchange$fG_change=round(pizchange$fG_change,1)
+pizchange$mG_change=round(pizchange$mG_change,1)
+pizchange$cG_change=round(pizchange$cG_change,1)
+
+
+
 
 
 #### SIZ MONITORING DATA ####
