@@ -70,6 +70,24 @@ plot(piz)
 plot(siz)
 plot(regions)
 
+## To see the attributes data
+piz@data
+
+## Add subregion information to attributes table
+#piz@data$sub_region <- NA
+
+piz@data$sub_region <- ifelse(piz@data$area_numbe == "127"|
+                              piz@data$area_numbe == "137"|
+                              piz@data$area_numbe == "500/1"|
+                              piz@data$area_numbe == "500/2"|
+                              piz@data$area_numbe == "500/3"|
+                              piz@data$area_numbe == "500/4"|
+                              piz@data$area_numbe == "500/5"|
+                              piz@data$area_numbe == "500/6"
+                              , 'WestIOW',NA)
+
+
+View(piz@data)
 
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
@@ -435,6 +453,9 @@ col_keys=c(
 ft <- colformat_num(ft,  col_keys = col_keys,digits = 2)
 
 
+## Align text in Site column
+ft <- align_text_col(ft, align = "left")
+ft <- align_nottext_col(ft, align = "right")
 ft
 
 
