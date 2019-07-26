@@ -76,6 +76,14 @@ piz@data
 ## Add subregion information to attributes table
 #piz@data$sub_region <- NA
 
+piz@data$sub_region <- ifelse(piz@data$area_numbe == "407"|
+                                piz@data$area_numbe == "340"|
+                                piz@data$area_numbe == "372/1"|
+                                piz@data$area_numbe == "451"|
+                                piz@data$area_numbe == "395/2"|
+                                piz@data$area_numbe == "395/1"|
+                                piz@data$area_numbe == "351"
+                              , 'EastIOW',NA)
 piz@data$sub_region <- ifelse(piz@data$area_numbe == "127"|
                               piz@data$area_numbe == "137"|
                               piz@data$area_numbe == "500/1"|
@@ -92,9 +100,10 @@ View(piz@data)
 
 ## Plot only licences from WestIOW sub_region
 
-piz <- subset(piz, sub_region=="WestIOW")
-
-plot(piz)
+piz.wiow <- subset(piz, sub_region=="WestIOW")
+piz.eiow<- subset(piz, sub_region=="EastIOW")
+plot(piz.wiow)
+plot(piz.eiow)
 
 
 #### 3. IMPORT MONITORING DATA ####
