@@ -89,6 +89,14 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "127"|
 
 View(piz@data)
 
+
+## Plot only licences from WestIOW sub_region
+
+piz <- subset(piz, sub_region=="WestIOW")
+
+plot(piz)
+
+
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
 mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
