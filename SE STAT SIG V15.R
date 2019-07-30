@@ -82,29 +82,36 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "407"|
                                 piz@data$area_numbe == "451"|
                                 piz@data$area_numbe == "395/2"|
                                 piz@data$area_numbe == "395/1"|
-                                piz@data$area_numbe == "351"
-                              , 'EastIOW',NA)
-piz@data$sub_region <- ifelse(piz@data$area_numbe == "127"|
-                              piz@data$area_numbe == "137"|
-                              piz@data$area_numbe == "500/1"|
-                              piz@data$area_numbe == "500/2"|
-                              piz@data$area_numbe == "500/3"|
-                              piz@data$area_numbe == "500/4"|
-                              piz@data$area_numbe == "500/5"|
-                              piz@data$area_numbe == "500/6"
-                              , 'WestIOW',NA)
-
-
-View(piz@data)
+                                piz@data$area_numbe == "351",
+                              "EastIOW",
+                         ifelse(piz@data$area_numbe == "127"|
+                                piz@data$area_numbe == "137"|
+                                piz@data$area_numbe == "500/1"|
+                                piz@data$area_numbe == "500/2"|
+                                piz@data$area_numbe == "500/3"|
+                                piz@data$area_numbe == "500/4"|
+                                piz@data$area_numbe == "500/5"|
+                                piz@data$area_numbe == "500/6",
+                                "WestIOW",
+                        ifelse(piz@data$area_numbe == "499"|
+                                piz@data$area_numbe == "435/2"|
+                                piz@data$area_numbe == "435/1"|
+                                piz@data$area_numbe == "396/1"|
+                                piz@data$area_numbe == "488"|
+                                piz@data$area_numbe == "453"|
+                                piz@data$area_numbe == "396/2",
+                                "Owers",
+                                NA)))
 
 
 ## Plot only licences from WestIOW sub_region
 
 piz.wiow <- subset(piz, sub_region=="WestIOW")
-piz.eiow<- subset(piz, sub_region=="EastIOW")
 plot(piz.wiow)
+piz.eiow<- subset(piz, sub_region=="EastIOW")
 plot(piz.eiow)
-
+piz.owers<- subset(piz, sub_region=="Owers")
+plot(piz.owers)
 
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
