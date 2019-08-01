@@ -101,7 +101,9 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "407"|
                                 piz@data$area_numbe == "453"|
                                 piz@data$area_numbe == "396/2",
                                 "Owers",
-                                NA)))
+                        ifelse(piz@data$area_numbe == "460",
+                                "Hastings",
+                                NA))))
 
 
 ## Plot only licences from WestIOW sub_region
@@ -112,6 +114,9 @@ piz.eiow<- subset(piz, sub_region=="EastIOW")
 plot(piz.eiow)
 piz.owers<- subset(piz, sub_region=="Owers")
 plot(piz.owers)
+piz.hastings<- subset(piz, sub_region=="Hastings")
+plot(piz.hastings)
+
 
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
@@ -211,15 +216,36 @@ dim(mondat5)
 
 ## Now join the baseline df to the monitoring df
 data=rbind(basdat5,mondat5)
-#View(data)
+View(data)
 
 ## Add column for PIZ
 data$Treatment="PIZ"
 
+
+######################################################################
+## Now stack samples so repeated for subregions
+
+## Create a copy of object 'data' containing baseline and mon samples
+data.sub=data
+names(data.sub)
+View(data.sub)
+## Change area_numbe to sub_region
+data.sub$area_numbe <- data.sub$sub_region
+
+data.all=data
+data.all$area_numbe <- "All"
+View(data.All)
+
+## Now join together objects 'data' and data.copy'
+data=rbind(data,data.sub,data.all)
+dim(data)
+dim(data.sub)
+dim(data.all)
+######################################################################
 ## Just take the required columns from df data (Code, seds, time, area_numbe,Treatment)
 names(data)
 str(data)
-data2=data[,c(1:8,11,16,30)]
+data2=data[,c(1:8,11,16,31)]
 #View(data2)
 names(data2)
 
@@ -236,15 +262,18 @@ data3$site=as.factor(data3$site)
 data3$time=as.factor(data3$time)
 #View(data3)
 ###################################################################
+
+
+
 ## Create a copy of df data3 to allow for calc of means by all sites
-data3copy=data3
+#data3copy=data3
 
 ## Change all values in col 'site' to 'all'
-data3copy$site <- "All"
-View(data3copy)
+#data3copy$site <- "All PIZ"
+#View(data3copy)
 
 ## Now join df for site piz samples together with df for all piz samples
-data4 <- rbind(data3,data3copy)
+#data4 <- rbind(data3,data3copy)
 
 ##############################################################
 #### PIZ SED SUMMARY BASELINE/MONITORING ####
@@ -252,7 +281,7 @@ data4 <- rbind(data3,data3copy)
 #library(plyr)
 detach("package:plyr", unload=TRUE) 
 #library(dplyr)
-sumdata=data4%>%
+sumdata=data3%>%
   group_by(site,time) %>%
   summarise(
     count = n(),
@@ -269,8 +298,9 @@ sumdata
 
 #### PIZ WILCOX TESTS ####
 ## Take relevant columns
-data5=data4[,c(10:9,2:8)]
+data5=data3[,c(10:9,2:8)]
 #View(data5)
+str(data5)
 #####################################################
 
 
@@ -285,7 +315,7 @@ table(site)
 site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ",
                "395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ",
                "435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ",
-               "488 PIZ", "500/3 PIZ","All")
+               "488 PIZ", "500/3 PIZ","All PIZ","EastIOW PIZ","Hastings PIZ","Owers PIZ","WestIOW PIZ")
 
 ## Number of sites
 nsites = length(site.names)# 17
