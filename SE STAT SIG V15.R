@@ -411,7 +411,10 @@ piz_pvalues_means2$cG_change <- piz_pvalues_means2$cG_m-piz_pvalues_means2$cG_b
 pizchange <- piz_pvalues_means2[,c(1:9,24:30)]
 View(pizchange)
 
-
+## get into order by n
+class(pizchange)
+str(pizchange)
+pizchange <- pizchange[order(-pizchange$count),]
 
 ## Round p-values to 3 dp
 pizchange$sc_change=round(pizchange$sc_change,1)
