@@ -61,6 +61,7 @@ writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
 regions<-readOGR("DATA/regions2.shp")
+ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
@@ -70,6 +71,13 @@ names(regions)=c("region","region_name","area_shape_km2")
 plot(piz)
 plot(siz)
 plot(regions)
+plot(ref)
+
+## Add som info into attributes table for ref
+View(ref@data)
+ref@data$Box=c(1,2,3,4,5,6)
+
+
 
 ## To see the attributes data
 piz@data
@@ -204,7 +212,73 @@ colnames(mondat)[1] <- "Code"
 pts_m=SpatialPoints(mondat[,(10:9)], 
                   proj4string = CRS(proj4string(piz)))
 
+###############################################################################################################
+# 19/08/2019
 
+dim(mondat)
+pizgis=over(pts_m,piz)
+View(pizgis)
+
+sizgis=over(pts_m,siz)
+View(sizgis)
+
+contgis=over(pts_m,regions)
+View(contgis)
+
+refgis=over(pts_m,ref)
+View(refgis)
+
+
+## Add station codes to each of the above objects
+stations=mondat[,1]# make vector for station codes
+stations
+pizgis$Code <- stations
+sizgis$Code <- stations
+contgis$Code <- stations
+refgis$Code <- stations
+
+
+## Add in treatment column
+pizgis$Treatment <- "PIZ"
+sizgis$Treatment <- "SIZ"
+contgis$Treatment <- "CONTEXT"
+refgis$Treatment <- "REF"
+
+## Now remove records from above objects that are not relevant (i.e. associated with the relevant treatment)
+pizgis2 <- pizgis[!is.na(pizgis$area_numb),]
+dim(pizgis2)#206
+names(sizgis)
+View(pizgis2)
+## Remove records from siz where no area (i.e. context and ref)
+sizgis2 <- sizgis[!is.na(sizgis$area_numb),]
+dim(sizgis2)#411
+View(sizgis2)
+## Remove records any stations which are also present in the PIZ object
+sizgis3 <-sizgis2[!sizgis2$Code %in% pizgis2$Code, , drop = FALSE]
+dim(sizgis3)#206
+View(sizgis3)
+
+## Drop non-ref stations
+refgis2 <- refgis[!is.na(refgis$Box),]
+dim(refgis2)#81
+
+## Drop non-context stations by removing stations present in piz, siz and ref
+contgis2 <- contgis[!contgis$Code %in% pizgis2$Code, , drop = FALSE]#remove piz stations
+contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove siz stations
+contgis4 <- contgis3[!contgis3$Code %in% refgis2$Code, , drop = FALSE]#remove ref stations
+dim(contgis4)
+## Sort out data for piz
+names(pizgis)
+pizgis2=pizgis[,c(20,4,19,5)]# select only cols of interest
+
+names(pizgis2)
+View(pizgis2)
+
+pizgis2$Treatment <- "PIZ"# add in a treatment column
+
+pizgis3 <- pizgis2[!is.na(pizgis2$area_numb),]
+View(pizgis3)
+###############################################################################################################
 #### 4. MONITORING DATA: PIZ ####
 ## Plot monitoring data points on PIZ polygons
 plot(piz, axes = TRUE)
