@@ -181,7 +181,101 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
                                 "Owers",
                                 NA))))))))))))
 
-
+siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
+                               siz@data$area_numbe == "501/2",
+                              "Thames Offshore",
+                              ifelse(siz@data$area_numbe == "447"|
+                                       siz@data$area_numbe == "509/1"|
+                                       siz@data$area_numbe == "509/2"|
+                                       siz@data$area_numbe == "510/1"|
+                                       siz@data$area_numbe == "510/2",
+                                     "Thames South",
+                                     ifelse(siz@data$area_numbe == "498"|
+                                              siz@data$area_numbe == "507/1"|
+                                              siz@data$area_numbe == "507/2"|
+                                              siz@data$area_numbe == "507/3"|
+                                              siz@data$area_numbe == "507/4"|
+                                              siz@data$area_numbe == "507/5"|
+                                              siz@data$area_numbe == "507/6",
+                                            "Thames North",
+                                            ifelse(siz@data$area_numbe == "472"|
+                                                     piz@data$area_numbe == "476"|
+                                                     piz@data$area_numbe == "486/1"|
+                                                     piz@data$area_numbe == "486/2"|
+                                                     piz@data$area_numbe == "486/3"|
+                                                     piz@data$area_numbe == "486/4"|
+                                                     piz@data$area_numbe == "486/5",
+                                                   "Bristol Channel True",
+                                                   ifelse(piz@data$area_numbe == "470/1"|
+                                                            piz@data$area_numbe == "470/2"|
+                                                            piz@data$area_numbe == "455"|
+                                                            piz@data$area_numbe == "459"|
+                                                            piz@data$area_name == "Bedwyn Sands",
+                                                          "Severn Estuary",      
+                                                          ifelse(piz@data$area_numbe == "506"|
+                                                                   piz@data$area_numbe == "483"|
+                                                                   piz@data$area_numbe == "484"|
+                                                                   piz@data$area_numbe == "492"|
+                                                                   piz@data$area_numbe == "515/2"|
+                                                                   piz@data$area_numbe == "515/1",
+                                                                 "Humber Offshore",
+                                                                 ifelse(piz@data$area_numbe == "514/1"|
+                                                                          piz@data$area_numbe == "514/2"|
+                                                                          piz@data$area_numbe == "514/3"|
+                                                                          piz@data$area_numbe == "514/4"|
+                                                                          piz@data$area_numbe == "493"|
+                                                                          piz@data$area_numbe == "197"|
+                                                                          piz@data$area_numbe == "400"|
+                                                                          piz@data$area_numbe == "106/1"|
+                                                                          piz@data$area_numbe == "106/2"|
+                                                                          piz@data$area_numbe == "106/3"|
+                                                                          piz@data$area_numbe == "480"|
+                                                                          piz@data$area_numbe == "439"|
+                                                                          piz@data$area_numbe == "481/1"|
+                                                                          piz@data$area_numbe == "481/2",
+                                                                        "Humber Inshore",      
+                                                                        ifelse(piz@data$area_numbe == "511"|
+                                                                                 piz@data$area_numbe == "512"|
+                                                                                 piz@data$area_numbe == "228"|
+                                                                                 piz@data$area_numbe == "240"|
+                                                                                 piz@data$area_numbe == "254"|
+                                                                                 piz@data$area_numbe == "212"|
+                                                                                 piz@data$area_numbe == "296"|
+                                                                                 piz@data$area_numbe == "494",
+                                                                               "Anglian Inshore",
+                                                                               ifelse(piz@data$area_numbe == "513/1"|
+                                                                                        piz@data$area_numbe == "513/2"|
+                                                                                        piz@data$area_numbe == "401/2B"|
+                                                                                        piz@data$area_numbe == "525"|
+                                                                                        piz@data$area_numbe == "430"| 
+                                                                                        piz@data$area_numbe == "242-361",
+                                                                                      "Anglian Offshore",
+                                                                                      ifelse(piz@data$area_numbe == "407"|
+                                                                                               piz@data$area_numbe == "340"|
+                                                                                               piz@data$area_numbe == "372/1"|
+                                                                                               piz@data$area_numbe == "451"|
+                                                                                               piz@data$area_numbe == "395/2"|
+                                                                                               piz@data$area_numbe == "395/1"|
+                                                                                               piz@data$area_numbe == "351",
+                                                                                             "East IOW",
+                                                                                             ifelse(piz@data$area_numbe == "127"|
+                                                                                                      piz@data$area_numbe == "137"|
+                                                                                                      piz@data$area_numbe == "500/1"|
+                                                                                                      piz@data$area_numbe == "500/2"|
+                                                                                                      piz@data$area_numbe == "500/3"|
+                                                                                                      piz@data$area_numbe == "500/4"|
+                                                                                                      piz@data$area_numbe == "500/5"|
+                                                                                                      piz@data$area_numbe == "500/6",
+                                                                                                    "West IOW",
+                                                                                                    ifelse(piz@data$area_numbe == "499"|
+                                                                                                             piz@data$area_numbe == "435/2"|
+                                                                                                             piz@data$area_numbe == "435/1"|
+                                                                                                             piz@data$area_numbe == "396/1"|
+                                                                                                             piz@data$area_numbe == "488"|
+                                                                                                             piz@data$area_numbe == "453"|
+                                                                                                             piz@data$area_numbe == "396/2",
+                                                                                                           "Owers",
+                                                                                                           NA))))))))))))
 ## Plot only licences from WestIOW sub_region
 
 piz.wiow <- subset(piz, sub_region=="West IOW")
@@ -267,17 +361,28 @@ contgis2 <- contgis[!contgis$Code %in% pizgis2$Code, , drop = FALSE]#remove piz 
 contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove siz stations
 contgis4 <- contgis3[!contgis3$Code %in% refgis2$Code, , drop = FALSE]#remove ref stations
 dim(contgis4)
-## Sort out data for piz
-names(pizgis)
-pizgis2=pizgis[,c(20,4,19,5)]# select only cols of interest
 
+## Now make sure all gis objects have required fields: Code, Region, Sub-region, Treatment, Area
+# PIZ
 names(pizgis2)
-View(pizgis2)
-
-pizgis2$Treatment <- "PIZ"# add in a treatment column
-
-pizgis3 <- pizgis2[!is.na(pizgis2$area_numb),]
+pizgis3 <- pizgis2 [,c(20,4,19,21,5)]
 View(pizgis3)
+colnames(pizgis3) <- c("Code","Region","Sub-region","Treatment","Area")
+
+
+# SIZ
+names(sizgis3)
+sizgis4 <- sizgis3[,c(19,4,19,21,5)]
+View(pizgis3)
+colnames(pizgis3) <- c("Code","Region","Sub-region","Treatment","Area")
+
+# REF
+
+
+# CONTEXT
+
+
+
 ###############################################################################################################
 #### 4. MONITORING DATA: PIZ ####
 ## Plot monitoring data points on PIZ polygons
