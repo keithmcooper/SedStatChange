@@ -74,10 +74,11 @@ plot(regions)
 plot(ref)
 
 ## Add som info into attributes table for ref
+
+ref@data$Box=c("Ref Box 1","Ref Box 2","Ref Box 3","Ref Box 4","Ref Box 5","Ref Box 6")
+ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
+ref@data$Sub_Region <- c("WestIOW","EastIOW","EastIOW","EastIOW","Owers","Hastings")
 View(ref@data)
-ref@data$Box=c(1,2,3,4,5,6)
-
-
 
 ## To see the attributes data
 piz@data
@@ -199,81 +200,81 @@ siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                               siz@data$area_numbe == "507/6",
                                             "Thames North",
                                             ifelse(siz@data$area_numbe == "472"|
-                                                     piz@data$area_numbe == "476"|
-                                                     piz@data$area_numbe == "486/1"|
-                                                     piz@data$area_numbe == "486/2"|
-                                                     piz@data$area_numbe == "486/3"|
-                                                     piz@data$area_numbe == "486/4"|
-                                                     piz@data$area_numbe == "486/5",
+                                                     siz@data$area_numbe == "476"|
+                                                     siz@data$area_numbe == "486/1"|
+                                                     siz@data$area_numbe == "486/2"|
+                                                     siz@data$area_numbe == "486/3"|
+                                                     siz@data$area_numbe == "486/4"|
+                                                     siz@data$area_numbe == "486/5",
                                                    "Bristol Channel True",
-                                                   ifelse(piz@data$area_numbe == "470/1"|
-                                                            piz@data$area_numbe == "470/2"|
-                                                            piz@data$area_numbe == "455"|
-                                                            piz@data$area_numbe == "459"|
-                                                            piz@data$area_name == "Bedwyn Sands",
+                                                   ifelse(siz@data$area_numbe == "470/1"|
+                                                            siz@data$area_numbe == "470/2"|
+                                                            siz@data$area_numbe == "455"|
+                                                            siz@data$area_numbe == "459"|
+                                                            siz@data$area_name == "Bedwyn Sands",
                                                           "Severn Estuary",      
-                                                          ifelse(piz@data$area_numbe == "506"|
-                                                                   piz@data$area_numbe == "483"|
-                                                                   piz@data$area_numbe == "484"|
-                                                                   piz@data$area_numbe == "492"|
-                                                                   piz@data$area_numbe == "515/2"|
-                                                                   piz@data$area_numbe == "515/1",
+                                                          ifelse(siz@data$area_numbe == "506"|
+                                                                   siz@data$area_numbe == "483"|
+                                                                   siz@data$area_numbe == "484"|
+                                                                   siz@data$area_numbe == "492"|
+                                                                   siz@data$area_numbe == "515/2"|
+                                                                   siz@data$area_numbe == "515/1",
                                                                  "Humber Offshore",
-                                                                 ifelse(piz@data$area_numbe == "514/1"|
-                                                                          piz@data$area_numbe == "514/2"|
-                                                                          piz@data$area_numbe == "514/3"|
-                                                                          piz@data$area_numbe == "514/4"|
-                                                                          piz@data$area_numbe == "493"|
-                                                                          piz@data$area_numbe == "197"|
-                                                                          piz@data$area_numbe == "400"|
-                                                                          piz@data$area_numbe == "106/1"|
-                                                                          piz@data$area_numbe == "106/2"|
-                                                                          piz@data$area_numbe == "106/3"|
-                                                                          piz@data$area_numbe == "480"|
-                                                                          piz@data$area_numbe == "439"|
-                                                                          piz@data$area_numbe == "481/1"|
-                                                                          piz@data$area_numbe == "481/2",
+                                                                 ifelse(siz@data$area_numbe == "514/1"|
+                                                                          siz@data$area_numbe == "514/2"|
+                                                                          siz@data$area_numbe == "514/3"|
+                                                                          siz@data$area_numbe == "514/4"|
+                                                                          siz@data$area_numbe == "493"|
+                                                                          siz@data$area_numbe == "197"|
+                                                                          siz@data$area_numbe == "400"|
+                                                                          siz@data$area_numbe == "106/1"|
+                                                                          siz@data$area_numbe == "106/2"|
+                                                                          siz@data$area_numbe == "106/3"|
+                                                                          siz@data$area_numbe == "480"|
+                                                                          siz@data$area_numbe == "439"|
+                                                                          siz@data$area_numbe == "481/1"|
+                                                                          siz@data$area_numbe == "481/2",
                                                                         "Humber Inshore",      
-                                                                        ifelse(piz@data$area_numbe == "511"|
-                                                                                 piz@data$area_numbe == "512"|
-                                                                                 piz@data$area_numbe == "228"|
-                                                                                 piz@data$area_numbe == "240"|
-                                                                                 piz@data$area_numbe == "254"|
-                                                                                 piz@data$area_numbe == "212"|
-                                                                                 piz@data$area_numbe == "296"|
-                                                                                 piz@data$area_numbe == "494",
+                                                                        ifelse(siz@data$area_numbe == "511"|
+                                                                                 siz@data$area_numbe == "512"|
+                                                                                 siz@data$area_numbe == "228"|
+                                                                                 siz@data$area_numbe == "240"|
+                                                                                 siz@data$area_numbe == "254"|
+                                                                                 siz@data$area_numbe == "212"|
+                                                                                 siz@data$area_numbe == "296"|
+                                                                                 siz@data$area_numbe == "494",
                                                                                "Anglian Inshore",
-                                                                               ifelse(piz@data$area_numbe == "513/1"|
-                                                                                        piz@data$area_numbe == "513/2"|
-                                                                                        piz@data$area_numbe == "401/2B"|
-                                                                                        piz@data$area_numbe == "525"|
-                                                                                        piz@data$area_numbe == "430"| 
-                                                                                        piz@data$area_numbe == "242-361",
+                                                                               ifelse(siz@data$area_numbe == "513/1"|
+                                                                                        siz@data$area_numbe == "513/2"|
+                                                                                        siz@data$area_numbe == "401/2B"|
+                                                                                        siz@data$area_numbe == "525"|
+                                                                                        siz@data$area_numbe == "430"| 
+                                                                                        siz@data$area_numbe == "242-361",
                                                                                       "Anglian Offshore",
-                                                                                      ifelse(piz@data$area_numbe == "407"|
-                                                                                               piz@data$area_numbe == "340"|
-                                                                                               piz@data$area_numbe == "372/1"|
-                                                                                               piz@data$area_numbe == "451"|
-                                                                                               piz@data$area_numbe == "395/2"|
-                                                                                               piz@data$area_numbe == "395/1"|
-                                                                                               piz@data$area_numbe == "351",
+                                                                                      ifelse(siz@data$area_numbe == "407"|
+                                                                                               siz@data$area_numbe == "340"|
+                                                                                               siz@data$area_numbe == "372/1"|
+                                                                                               siz@data$area_numbe == "451"|
+                                                                                               siz@data$area_numbe == "395/2"|
+                                                                                               siz@data$area_numbe == "395/1"|
+                                                                                               siz@data$area_numbe == "351",
                                                                                              "East IOW",
-                                                                                             ifelse(piz@data$area_numbe == "127"|
-                                                                                                      piz@data$area_numbe == "137"|
-                                                                                                      piz@data$area_numbe == "500/1"|
-                                                                                                      piz@data$area_numbe == "500/2"|
-                                                                                                      piz@data$area_numbe == "500/3"|
-                                                                                                      piz@data$area_numbe == "500/4"|
-                                                                                                      piz@data$area_numbe == "500/5"|
-                                                                                                      piz@data$area_numbe == "500/6",
+                                                                                             ifelse(siz@data$area_numbe == "127"|
+                                                                                                      siz@data$area_numbe == "137"|
+                                                                                                      siz@data$area_numbe == "500/1"|
+                                                                                                      siz@data$area_numbe == "500/2"|
+                                                                                                      siz@data$area_numbe == "500/3"|
+                                                                                                      siz@data$area_numbe == "500/4"|
+                                                                                                      siz@data$area_numbe == "500/5"|
+                                                                                                      siz@data$area_numbe == "500/6",
                                                                                                     "West IOW",
-                                                                                                    ifelse(piz@data$area_numbe == "499"|
-                                                                                                             piz@data$area_numbe == "435/2"|
-                                                                                                             piz@data$area_numbe == "435/1"|
-                                                                                                             piz@data$area_numbe == "396/1"|
-                                                                                                             piz@data$area_numbe == "488"|
-                                                                                                             piz@data$area_numbe == "453"|
-                                                                                                             piz@data$area_numbe == "396/2",
+                                                                                                    ifelse(siz@data$area_numbe == "499"|
+                                                                                                             siz@data$area_numbe == "435/2"|
+                                                                                                             siz@data$area_numbe == "435/1"|
+                                                                                                             siz@data$area_numbe == "396/1"|
+                                                                                                             siz@data$area_numbe == "488"|
+                                                                                                             siz@data$area_numbe == "453"|
+                                                                                                             siz@data$area_numbe == "396/2",
                                                                                                            "Owers",
                                                                                                            NA))))))))))))
 ## Plot only licences from WestIOW sub_region
@@ -367,19 +368,33 @@ dim(contgis4)
 names(pizgis2)
 pizgis3 <- pizgis2 [,c(20,4,19,21,5)]
 View(pizgis3)
-colnames(pizgis3) <- c("Code","Region","Sub-region","Treatment","Area")
+colnames(pizgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 
 
 # SIZ
-names(sizgis3)
-sizgis4 <- sizgis3[,c(19,4,19,21,5)]
-View(pizgis3)
-colnames(pizgis3) <- c("Code","Region","Sub-region","Treatment","Area")
+names(sizgis4)
+sizgis4 <- sizgis3[,c(20,5,19,21,6)]
+View(sizgis4)
+colnames(sizgis4) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # REF
-
-
+names(refgis2)
+refgis3 <- refgis2[,c(5,3,4,6,2)]
+names(refgis3)
+colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 # CONTEXT
+names(contgis4)
+contgis5 <- contgis4[,c(4,2,5)]
+colnames(contgis5) <- c("Code","Region","Treatment")
+View(contgis5)
+contgis5$Sub_region <- NA
+contgis5$Area <- NA
+contgis6=contgis5[,c(1,2,4,3,5)]
+names(contgis6)
+
+## Now bring objects together
+treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
+View(treatall)
 
 
 
