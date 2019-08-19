@@ -75,14 +75,14 @@ plot(ref)
 
 ## Add som info into attributes table for ref
 
-ref@data$Box=c("Ref Box 1","Ref Box 2","Ref Box 3","Ref Box 4","Ref Box 5","Ref Box 6")
+ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
 ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
-ref@data$Sub_Region <- c("WestIOW","EastIOW","EastIOW","EastIOW","Owers","Hastings")
+ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
 View(ref@data)
 
 ## To see the attributes data
 piz@data
-View(piz@data)
+#View(piz@data)
 ## Add subregion information to attributes table
 #piz@data$sub_region <- NA
 
@@ -180,7 +180,9 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
                                 piz@data$area_numbe == "453"|
                                 piz@data$area_numbe == "396/2",
                                 "Owers",
-                                NA))))))))))))
+                               ifelse(piz@data$area_numbe == "460",                                                                                                                 
+                                      "Hastings",
+                                NA)))))))))))))
 
 siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                siz@data$area_numbe == "501/2",
@@ -276,7 +278,11 @@ siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                                                                                              siz@data$area_numbe == "453"|
                                                                                                              siz@data$area_numbe == "396/2",
                                                                                                            "Owers",
-                                                                                                           NA))))))))))))
+                                                                                                           ifelse(siz@data$area_numbe == "460",                                                                                                                 
+                                                                                                                  "Hastings",
+                                                                                                           NA)))))))))))))
+
+View(siz@data)
 ## Plot only licences from WestIOW sub_region
 
 piz.wiow <- subset(piz, sub_region=="West IOW")
@@ -312,16 +318,16 @@ pts_m=SpatialPoints(mondat[,(10:9)],
 
 dim(mondat)
 pizgis=over(pts_m,piz)
-View(pizgis)
+#View(pizgis)
 
 sizgis=over(pts_m,siz)
-View(sizgis)
+#View(sizgis)
 
 contgis=over(pts_m,regions)
-View(contgis)
+#View(contgis)
 
 refgis=over(pts_m,ref)
-View(refgis)
+#View(refgis)
 
 
 ## Add station codes to each of the above objects
@@ -336,22 +342,23 @@ refgis$Code <- stations
 ## Add in treatment column
 pizgis$Treatment <- "PIZ"
 sizgis$Treatment <- "SIZ"
-contgis$Treatment <- "CONTEXT"
+#contgis$Treatment <- "CONTEXT"
+contgis$Treatment <- "REF"
 refgis$Treatment <- "REF"
 
 ## Now remove records from above objects that are not relevant (i.e. associated with the relevant treatment)
 pizgis2 <- pizgis[!is.na(pizgis$area_numb),]
 dim(pizgis2)#206
 names(sizgis)
-View(pizgis2)
+#View(pizgis2)
 ## Remove records from siz where no area (i.e. context and ref)
 sizgis2 <- sizgis[!is.na(sizgis$area_numb),]
 dim(sizgis2)#411
-View(sizgis2)
+#View(sizgis2)
 ## Remove records any stations which are also present in the PIZ object
 sizgis3 <-sizgis2[!sizgis2$Code %in% pizgis2$Code, , drop = FALSE]
 dim(sizgis3)#206
-View(sizgis3)
+#View(sizgis3)
 
 ## Drop non-ref stations
 refgis2 <- refgis[!is.na(refgis$Box),]
@@ -367,14 +374,14 @@ dim(contgis4)
 # PIZ
 names(pizgis2)
 pizgis3 <- pizgis2 [,c(20,4,19,21,5)]
-View(pizgis3)
+#View(pizgis3)
 colnames(pizgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 
 
 # SIZ
 names(sizgis4)
 sizgis4 <- sizgis3[,c(20,5,19,21,6)]
-View(sizgis4)
+#View(sizgis4)
 colnames(sizgis4) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # REF
@@ -386,18 +393,125 @@ colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 names(contgis4)
 contgis5 <- contgis4[,c(4,2,5)]
 colnames(contgis5) <- c("Code","Region","Treatment")
-View(contgis5)
+#View(contgis5)
 contgis5$Sub_region <- NA
-contgis5$Area <- NA
+#contgis5$Area <- NA
+contgis5$Area <- "Context"
 contgis6=contgis5[,c(1,2,4,3,5)]
 names(contgis6)
 
 ## Now bring objects together
 treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
-View(treatall)
+#View(treatall)
+
+## Get object 'treatall' ordered by Code
+treatall2=treatall[order(treatall$Code),]
+ 
+## Get baselline data and match to monitoring data
+## Bring in  SC baseline data
+basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
+basdat
+dim(basdat)# 771  10
+
+## Add col for 'time' (Baseline or Monitoring)
+basdat$time="b"
+
+## Change name of col1 to 'Code'
+colnames(basdat)[1] <- "Code"
+#View(basdat)
+
+#### PIZ MATCHED MONITORING AND BASELINE DATA ####
+## Select baseline samples where there is an accompanying monitoring sample
+basdat2=basdat %>%
+  filter(Code %in% mondat$Code)
+dim(basdat2)# 203 20
+dim(mondat)
+#View(basdat5)
+
+## Make sure there are no stations in the monitoring set without a corresponding baseline station
+mondat2=mondat %>%
+  filter(Code %in% basdat2$Code)
+
+mondat2
+dim(mondat2)
+#View(mondat2)
+
+## Now join the baseline df to the monitoring df
+data=rbind(basdat2,mondat2)
+#View(data)
+dim(data)#514
 
 
 
+## Now stack treatall2 on treatall2 so this object can be jouinied to df data (m and b)
+treatall3=rbind(treatall2,treatall2)
+dim(treatall3)
+
+## only keep stations in treatall2 that are in data
+treatall4 <- treatall3 %>% semi_join(data, by = "Code") 
+dim(test)
+#View(test)
+## Now add mon and baseline sed data to gis treatment object
+data2 <- cbind(treatall4,data[,2:11])
+#View(data2)
+
+#### PIZ SED SUMMARY BASELINE/MONITORING ####
+## Get summary data by area
+#library(plyr)
+detach("package:plyr", unload=TRUE) 
+#library(dplyr)
+
+## Data by Area
+sumdata=data2%>%
+  group_by(Treatment,Area,time) %>%
+  summarise(
+    count = n(),
+    sc = mean(SC, na.rm = TRUE),  
+    fS = mean(fS, na.rm = TRUE),
+    mS = mean(mS, na.rm = TRUE),
+    cS = mean(cS, na.rm = TRUE),
+    fG = mean(fG, na.rm = TRUE),
+    mG = mean(mG, na.rm = TRUE),
+    cG = mean(cG, na.rm = TRUE))
+sumdata
+View(sumdata)
+
+## Data by Treatment
+sumdataTreat=data2%>%
+  group_by(Treatment,time) %>%
+  summarise(
+    count = n(),
+    sc = mean(SC, na.rm = TRUE),  
+    fS = mean(fS, na.rm = TRUE),
+    mS = mean(mS, na.rm = TRUE),
+    cS = mean(cS, na.rm = TRUE),
+    fG = mean(fG, na.rm = TRUE),
+    mG = mean(mG, na.rm = TRUE),
+    cG = mean(cG, na.rm = TRUE))
+sumdataTreat
+View(sumdataTreat)
+
+## Data by Sub-region
+sumdataSubRebion=data2%>%
+  group_by(Treatment,Sub_region,time) %>%
+  summarise(
+    count = n(),
+    sc = mean(SC, na.rm = TRUE),  
+    fS = mean(fS, na.rm = TRUE),
+    mS = mean(mS, na.rm = TRUE),
+    cS = mean(cS, na.rm = TRUE),
+    fG = mean(fG, na.rm = TRUE),
+    mG = mean(mG, na.rm = TRUE),
+    cG = mean(cG, na.rm = TRUE))
+sumdataSubRebion
+View(sumdataSubRebion)
+
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
 ###############################################################################################################
 #### 4. MONITORING DATA: PIZ ####
 ## Plot monitoring data points on PIZ polygons
