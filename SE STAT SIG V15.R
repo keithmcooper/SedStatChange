@@ -75,7 +75,8 @@ plot(ref)
 
 ## Add som info into attributes table for ref
 
-ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
+#ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
+ref@data$Box=c(1,2,3,4,5,6)
 ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
 ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
 View(ref@data)
@@ -187,72 +188,72 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
 siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                siz@data$area_numbe == "501/2",
                               "Thames Offshore",
-                              ifelse(siz@data$area_numbe == "447"|
-                                       siz@data$area_numbe == "509/1"|
-                                       siz@data$area_numbe == "509/2"|
-                                       siz@data$area_numbe == "510/1"|
-                                       siz@data$area_numbe == "510/2",
-                                     "Thames South",
-                                     ifelse(siz@data$area_numbe == "498"|
-                                              siz@data$area_numbe == "507/1"|
-                                              siz@data$area_numbe == "507/2"|
-                                              siz@data$area_numbe == "507/3"|
-                                              siz@data$area_numbe == "507/4"|
-                                              siz@data$area_numbe == "507/5"|
-                                              siz@data$area_numbe == "507/6",
-                                            "Thames North",
-                                            ifelse(siz@data$area_numbe == "472"|
-                                                     siz@data$area_numbe == "476"|
-                                                     siz@data$area_numbe == "486/1"|
-                                                     siz@data$area_numbe == "486/2"|
-                                                     siz@data$area_numbe == "486/3"|
-                                                     siz@data$area_numbe == "486/4"|
-                                                     siz@data$area_numbe == "486/5",
-                                                   "Bristol Channel True",
-                                                   ifelse(siz@data$area_numbe == "470/1"|
-                                                            siz@data$area_numbe == "470/2"|
-                                                            siz@data$area_numbe == "455"|
-                                                            siz@data$area_numbe == "459"|
-                                                            siz@data$area_name == "Bedwyn Sands",
-                                                          "Severn Estuary",      
-                                                          ifelse(siz@data$area_numbe == "506"|
-                                                                   siz@data$area_numbe == "483"|
-                                                                   siz@data$area_numbe == "484"|
-                                                                   siz@data$area_numbe == "492"|
-                                                                   siz@data$area_numbe == "515/2"|
-                                                                   siz@data$area_numbe == "515/1",
-                                                                 "Humber Offshore",
-                                                                 ifelse(siz@data$area_numbe == "514/1"|
-                                                                          siz@data$area_numbe == "514/2"|
-                                                                          siz@data$area_numbe == "514/3"|
-                                                                          siz@data$area_numbe == "514/4"|
-                                                                          siz@data$area_numbe == "493"|
-                                                                          siz@data$area_numbe == "197"|
-                                                                          siz@data$area_numbe == "400"|
-                                                                          siz@data$area_numbe == "106/1"|
-                                                                          siz@data$area_numbe == "106/2"|
-                                                                          siz@data$area_numbe == "106/3"|
-                                                                          siz@data$area_numbe == "480"|
-                                                                          siz@data$area_numbe == "439"|
-                                                                          siz@data$area_numbe == "481/1"|
-                                                                          siz@data$area_numbe == "481/2",
-                                                                        "Humber Inshore",      
-                                                                        ifelse(siz@data$area_numbe == "511"|
-                                                                                 siz@data$area_numbe == "512"|
-                                                                                 siz@data$area_numbe == "228"|
-                                                                                 siz@data$area_numbe == "240"|
-                                                                                 siz@data$area_numbe == "254"|
-                                                                                 siz@data$area_numbe == "212"|
-                                                                                 siz@data$area_numbe == "296"|
-                                                                                 siz@data$area_numbe == "494",
-                                                                               "Anglian Inshore",
-                                                                               ifelse(siz@data$area_numbe == "513/1"|
-                                                                                        siz@data$area_numbe == "513/2"|
-                                                                                        siz@data$area_numbe == "401/2B"|
-                                                                                        siz@data$area_numbe == "525"|
-                                                                                        siz@data$area_numbe == "430"| 
-                                                                                        siz@data$area_numbe == "242-361",
-                                                                                      "Anglian Offshore",
+                        ifelse(siz@data$area_numbe == "447"|
+                                siz@data$area_numbe == "509/1"|
+                                siz@data$area_numbe == "509/2"|
+                                siz@data$area_numbe == "510/1"|
+                                siz@data$area_numbe == "510/2",
+                                "Thames South",
+                        ifelse(siz@data$area_numbe == "498"|
+                                siz@data$area_numbe == "507/1"|
+                                siz@data$area_numbe == "507/2"|
+                                siz@data$area_numbe == "507/3"|
+                                siz@data$area_numbe == "507/4"|
+                                siz@data$area_numbe == "507/5"|
+                                siz@data$area_numbe == "507/6",
+                                "Thames North",
+                        ifelse(siz@data$area_numbe == "472"|
+                                siz@data$area_numbe == "476"|
+                                siz@data$area_numbe == "486/1"|
+                                siz@data$area_numbe == "486/2"|
+                                siz@data$area_numbe == "486/3"|
+                                siz@data$area_numbe == "486/4"|
+                                siz@data$area_numbe == "486/5",
+                                "Bristol Channel True",
+                        ifelse(siz@data$area_numbe == "470/1"|
+                                siz@data$area_numbe == "470/2"|
+                                siz@data$area_numbe == "455"|
+                                siz@data$area_numbe == "459"|
+                                siz@data$area_name == "Bedwyn Sands",
+                                "Severn Estuary",      
+                        ifelse(siz@data$area_numbe == "506"|
+                                siz@data$area_numbe == "483"|
+                                siz@data$area_numbe == "484"|
+                                siz@data$area_numbe == "492"|
+                                siz@data$area_numbe == "515/2"|
+                                siz@data$area_numbe == "515/1",
+                                "Humber Offshore",
+                        ifelse(siz@data$area_numbe == "514/1"|
+                                siz@data$area_numbe == "514/2"|
+                                siz@data$area_numbe == "514/3"|
+                                siz@data$area_numbe == "514/4"|
+                                siz@data$area_numbe == "493"|
+                                siz@data$area_numbe == "197"|
+                                siz@data$area_numbe == "400"|
+                                siz@data$area_numbe == "106/1"|
+                                siz@data$area_numbe == "106/2"|
+                                siz@data$area_numbe == "106/3"|
+                                siz@data$area_numbe == "480"|
+                                siz@data$area_numbe == "439"|
+                                siz@data$area_numbe == "481/1"|
+                                siz@data$area_numbe == "481/2",
+                                "Humber Inshore",      
+                                ifelse(siz@data$area_numbe == "511"|
+                                siz@data$area_numbe == "512"|
+                                siz@data$area_numbe == "228"|
+                                siz@data$area_numbe == "240"|
+                                siz@data$area_numbe == "254"|
+                                siz@data$area_numbe == "212"|
+                                siz@data$area_numbe == "296"|
+                                siz@data$area_numbe == "494",
+                                "Anglian Inshore",
+                          ifelse(siz@data$area_numbe == "513/1"|
+                                siz@data$area_numbe == "513/2"|
+                                siz@data$area_numbe == "401/2B"|
+                                siz@data$area_numbe == "525"|
+                                siz@data$area_numbe == "430"| 
+                                siz@data$area_numbe == "242-361",
+                                "Anglian Offshore",
                                                                                       ifelse(siz@data$area_numbe == "407"|
                                                                                                siz@data$area_numbe == "340"|
                                                                                                siz@data$area_numbe == "372/1"|
@@ -317,18 +318,11 @@ pts_m=SpatialPoints(mondat[,(10:9)],
 # 19/08/2019
 
 dim(mondat)
-pizgis=over(pts_m,piz)
-#View(pizgis)
-
-sizgis=over(pts_m,siz)
-#View(sizgis)
-
-contgis=over(pts_m,regions)
-#View(contgis)
-
-refgis=over(pts_m,ref)
-#View(refgis)
-
+## Identify Stations within different treatment categories
+pizgis=over(pts_m,piz) # PIZ
+sizgis=over(pts_m,siz) # SIZ
+contgis=over(pts_m,regions) # CONTEXT
+refgis=over(pts_m,ref) # REF
 
 ## Add station codes to each of the above objects
 stations=mondat[,1]# make vector for station codes
@@ -338,27 +332,24 @@ sizgis$Code <- stations
 contgis$Code <- stations
 refgis$Code <- stations
 
-
-## Add in treatment column
+## Add treatment column with relevant group
 pizgis$Treatment <- "PIZ"
 sizgis$Treatment <- "SIZ"
-#contgis$Treatment <- "CONTEXT"
 contgis$Treatment <- "REF"
 refgis$Treatment <- "REF"
 
-## Now remove records from above objects that are not relevant (i.e. associated with the relevant treatment)
-pizgis2 <- pizgis[!is.na(pizgis$area_numb),]
+## Remove records from above objects that are not relevant (i.e. not associated with the relevant treatment)
+pizgis2 <- pizgis[!is.na(pizgis$area_numb),] # PIZ, remove NAs
 dim(pizgis2)#206
-names(sizgis)
-#View(pizgis2)
-## Remove records from siz where no area (i.e. context and ref)
+
+
+## 2 step process for SIZ: 1.  Remove records with no area (i.e. Context and Ref)
 sizgis2 <- sizgis[!is.na(sizgis$area_numb),]
 dim(sizgis2)#411
-#View(sizgis2)
-## Remove records any stations which are also present in the PIZ object
+
+## 2. Remove records any stations which are also present in the PIZ object
 sizgis3 <-sizgis2[!sizgis2$Code %in% pizgis2$Code, , drop = FALSE]
 dim(sizgis3)#206
-#View(sizgis3)
 
 ## Drop non-ref stations
 refgis2 <- refgis[!is.na(refgis$Box),]
@@ -370,18 +361,15 @@ contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove si
 contgis4 <- contgis3[!contgis3$Code %in% refgis2$Code, , drop = FALSE]#remove ref stations
 dim(contgis4)
 
-## Now make sure all gis objects have required fields: Code, Region, Sub-region, Treatment, Area
+## Now make sure all GIS query objects have required fields: Code, Region, Sub-region, Treatment, Area
 # PIZ
 names(pizgis2)
 pizgis3 <- pizgis2 [,c(20,4,19,21,5)]
-#View(pizgis3)
 colnames(pizgis3) <- c("Code","Region","Sub_region","Treatment","Area")
-
 
 # SIZ
 names(sizgis4)
 sizgis4 <- sizgis3[,c(20,5,19,21,6)]
-#View(sizgis4)
 colnames(sizgis4) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # REF
@@ -389,31 +377,29 @@ names(refgis2)
 refgis3 <- refgis2[,c(5,3,4,6,2)]
 names(refgis3)
 colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
+
 # CONTEXT
 names(contgis4)
 contgis5 <- contgis4[,c(4,2,5)]
 colnames(contgis5) <- c("Code","Region","Treatment")
-#View(contgis5)
 contgis5$Sub_region <- NA
-#contgis5$Area <- NA
 contgis5$Area <- "Context"
 contgis6=contgis5[,c(1,2,4,3,5)]
 names(contgis6)
 
-## Now bring objects together
+## Now bring GIS query objects together
 treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
 #View(treatall)
 
-## Get object 'treatall' ordered by Code
+## Order object 'treatall' by Code so it's ready ro cbind to monitoring data
 treatall2=treatall[order(treatall$Code),]
  
-## Get baselline data and match to monitoring data
-## Bring in  SC baseline data
+## Bring in  SC baseline data and match to monitoring data
 basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
 dim(basdat)# 771  10
 
-## Add col for 'time' (Baseline or Monitoring)
+## Add col for 'time' (b = Baseline)
 basdat$time="b"
 
 ## Change name of col1 to 'Code'
