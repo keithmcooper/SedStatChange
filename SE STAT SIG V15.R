@@ -75,8 +75,8 @@ plot(ref)
 
 ## Add som info into attributes table for ref
 
-#ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
-ref@data$Box=c(1,2,3,4,5,6)
+ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
+#ref@data$Box=c(1,2,3,4,5,6)
 ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
 ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
 View(ref@data)
@@ -238,7 +238,7 @@ siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                 siz@data$area_numbe == "481/1"|
                                 siz@data$area_numbe == "481/2",
                                 "Humber Inshore",      
-                                ifelse(siz@data$area_numbe == "511"|
+                        ifelse(siz@data$area_numbe == "511"|
                                 siz@data$area_numbe == "512"|
                                 siz@data$area_numbe == "228"|
                                 siz@data$area_numbe == "240"|
@@ -247,45 +247,45 @@ siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                 siz@data$area_numbe == "296"|
                                 siz@data$area_numbe == "494",
                                 "Anglian Inshore",
-                          ifelse(siz@data$area_numbe == "513/1"|
+                        ifelse(siz@data$area_numbe == "513/1"|
                                 siz@data$area_numbe == "513/2"|
                                 siz@data$area_numbe == "401/2B"|
                                 siz@data$area_numbe == "525"|
                                 siz@data$area_numbe == "430"| 
                                 siz@data$area_numbe == "242-361",
                                 "Anglian Offshore",
-                                                                                      ifelse(siz@data$area_numbe == "407"|
-                                                                                               siz@data$area_numbe == "340"|
-                                                                                               siz@data$area_numbe == "372/1"|
-                                                                                               siz@data$area_numbe == "451"|
-                                                                                               siz@data$area_numbe == "395/2"|
-                                                                                               siz@data$area_numbe == "395/1"|
-                                                                                               siz@data$area_numbe == "351",
-                                                                                             "East IOW",
-                                                                                             ifelse(siz@data$area_numbe == "127"|
-                                                                                                      siz@data$area_numbe == "137"|
-                                                                                                      siz@data$area_numbe == "500/1"|
-                                                                                                      siz@data$area_numbe == "500/2"|
-                                                                                                      siz@data$area_numbe == "500/3"|
-                                                                                                      siz@data$area_numbe == "500/4"|
-                                                                                                      siz@data$area_numbe == "500/5"|
-                                                                                                      siz@data$area_numbe == "500/6",
-                                                                                                    "West IOW",
-                                                                                                    ifelse(siz@data$area_numbe == "499"|
-                                                                                                             siz@data$area_numbe == "435/2"|
-                                                                                                             siz@data$area_numbe == "435/1"|
-                                                                                                             siz@data$area_numbe == "396/1"|
-                                                                                                             siz@data$area_numbe == "488"|
-                                                                                                             siz@data$area_numbe == "453"|
-                                                                                                             siz@data$area_numbe == "396/2",
-                                                                                                           "Owers",
-                                                                                                           ifelse(siz@data$area_numbe == "460",                                                                                                                 
-                                                                                                                  "Hastings",
-                                                                                                           NA)))))))))))))
+                          ifelse(siz@data$area_numbe == "407"|
+                                 siz@data$area_numbe == "340"|
+                                 siz@data$area_numbe == "372/1"|
+                                 siz@data$area_numbe == "451"|
+                                 siz@data$area_numbe == "395/2"|
+                                 siz@data$area_numbe == "395/1"|
+                                 siz@data$area_numbe == "351",
+                                 "East IOW",
+                          ifelse(siz@data$area_numbe == "127"|
+                                 siz@data$area_numbe == "137"|
+                                 siz@data$area_numbe == "500/1"|
+                                 siz@data$area_numbe == "500/2"|
+                                 siz@data$area_numbe == "500/3"|
+                                 siz@data$area_numbe == "500/4"|
+                                 siz@data$area_numbe == "500/5"|
+                                 siz@data$area_numbe == "500/6",
+                                 "West IOW",
+                          ifelse(siz@data$area_numbe == "499"|
+                                siz@data$area_numbe == "435/2"|
+                                siz@data$area_numbe == "435/1"|
+                                siz@data$area_numbe == "396/1"|
+                                siz@data$area_numbe == "488"|
+                                siz@data$area_numbe == "453"|
+                                siz@data$area_numbe == "396/2",
+                                "Owers",
+                          ifelse(siz@data$area_numbe == "460",                                                                                                                 
+                                "Hastings",
+                               NA)))))))))))))
 
 View(siz@data)
-## Plot only licences from WestIOW sub_region
 
+## Plot only licences from WestIOW sub_region
 piz.wiow <- subset(piz, sub_region=="West IOW")
 plot(piz.wiow)
 piz.eiow<- subset(piz, sub_region=="East IOW")
@@ -296,6 +296,7 @@ piz.hunoff <- subset(piz, sub_region=="Humber Offshore")
 plot(piz.hunoff)
 piz.hunins <- subset(piz, sub_region=="Humber Inshore")
 plot(piz.hunins)
+
 
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
@@ -429,7 +430,7 @@ dim(data)#514
 
 
 
-## Now stack treatall2 on treatall2 so this object can be jouinied to df data (m and b)
+## Now stack treatall2 on treatall2 so this object can be joinied to df data (m and b)
 treatall3=rbind(treatall2,treatall2)
 dim(treatall3)
 
@@ -440,6 +441,27 @@ dim(test)
 ## Now add mon and baseline sed data to gis treatment object
 data2 <- cbind(treatall4,data[,2:11])
 #View(data2)
+names(data2)
+###############################################################
+#20/08/2019
+## Create a col for Licence no. and PIZ
+data2$site <- paste(data2$Area,data2$Treatment)
+
+## Drop cols Treatment and Area_Numbe from df data 2
+names(data2)
+data3=data2[,c(1,6:12,15,16)]
+names(data3)
+
+## Check and update col types
+str(data3)
+data3$site=as.factor(data3$site)
+data3$time=as.factor(data3$time)
+
+names(data3)
+
+
+
+#############################################################
 
 #### PIZ SED SUMMARY BASELINE/MONITORING ####
 ## Get summary data by area
@@ -448,8 +470,8 @@ detach("package:plyr", unload=TRUE)
 #library(dplyr)
 
 ## Data by Area
-sumdata=data2%>%
-  group_by(Treatment,Area,time) %>%
+sumdata=data3%>%
+  group_by(site,time) %>%
   summarise(
     count = n(),
     sc = mean(SC, na.rm = TRUE),  
@@ -462,35 +484,76 @@ sumdata=data2%>%
 sumdata
 View(sumdata)
 
-## Data by Treatment
-sumdataTreat=data2%>%
-  group_by(Treatment,time) %>%
-  summarise(
-    count = n(),
-    sc = mean(SC, na.rm = TRUE),  
-    fS = mean(fS, na.rm = TRUE),
-    mS = mean(mS, na.rm = TRUE),
-    cS = mean(cS, na.rm = TRUE),
-    fG = mean(fG, na.rm = TRUE),
-    mG = mean(mG, na.rm = TRUE),
-    cG = mean(cG, na.rm = TRUE))
-sumdataTreat
-View(sumdataTreat)
 
-## Data by Sub-region
-sumdataSubRebion=data2%>%
-  group_by(Treatment,Sub_region,time) %>%
-  summarise(
-    count = n(),
-    sc = mean(SC, na.rm = TRUE),  
-    fS = mean(fS, na.rm = TRUE),
-    mS = mean(mS, na.rm = TRUE),
-    cS = mean(cS, na.rm = TRUE),
-    fG = mean(fG, na.rm = TRUE),
-    mG = mean(mG, na.rm = TRUE),
-    cG = mean(cG, na.rm = TRUE))
-sumdataSubRebion
-View(sumdataSubRebion)
+
+######################################################################################################################
+#20/0/2019
+#### PIZ WILCOX TESTS ####
+## Take relevant columns
+names(data3)
+## Take relevant columns
+data4=data3[,c(10:9,2:8)]
+data4
+
+## Creat a vector for site
+site = as.character(data4$site)
+
+## Identify the number of sites for each site
+table(site)
+
+## Vector for site names
+#site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ","395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ","435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ","488 PIZ", "500/3 PIZ")
+site.names =as.character(levels(data4$site))
+## Number of sites
+nsites = length(site.names)# 16
+
+## Matrix for p-values
+pmatrix = matrix(999, ncol=7, nrow=nsites)
+
+## You just do a loop over the N sites. Select out the rows for the jth site (j=1 to N) on each iteration of the loop. And then do the Wilcoxon tests for that site
+for (j in 1:nsites) {
+  use = data4[site==site.names[j],]
+  for (k in 3:9) {
+    varb = use[,k][use$time=="b"]
+    varm = use[,k][use$time=="m"]
+    pmatrix[j,(k-2)] = wilcox.test(varb ,varm, alt="two.sided",paired=T)$p.value
+  }
+}
+
+round(pmatrix,3)
+## Change pmatrix from a matrix to a dataframe
+pmatrix=as.data.frame(pmatrix)
+pmatrix
+
+## Add in column names
+colnames(pmatrix)=c("cG","mG","fG","cS","mS","fS","SC")
+pmatrix
+
+## Add in row names (site)
+pmatrix$site=site.names
+pmatrix
+
+## Change order of df
+pmatrix2=pmatrix[,c(8,1:7)]
+pmatrix2
+
+## Round p-values to 3 dp
+pmatrix2$cG=round(pmatrix2$cG,3)
+pmatrix2$mG=round(pmatrix2$mG,3)
+pmatrix2$fG=round(pmatrix2$fG,3)
+pmatrix2$cS=round(pmatrix2$cS,3)
+pmatrix2$mS=round(pmatrix2$mS,3)
+pmatrix2$fS=round(pmatrix2$fS,3)
+pmatrix2$SC=round(pmatrix2$SC,3)
+pmatrix2
+
+
+
+
+
+
+
+
 
 ###############################################################################################################
 ###############################################################################################################
