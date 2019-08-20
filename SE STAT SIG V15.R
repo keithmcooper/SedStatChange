@@ -57,6 +57,7 @@ writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=
 
 
 #### 2. IMPORT POLYGONS FROM DATA FOLDER ####
+
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
@@ -73,30 +74,29 @@ plot(siz)
 plot(regions)
 plot(ref)
 
-## Add som info into attributes table for ref
-
-ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
-#ref@data$Box=c(1,2,3,4,5,6)
-ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
-ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
-View(ref@data)
-
 ## To see the attributes data
 piz@data
 #View(piz@data)
-## Add subregion information to attributes table
-#piz@data$sub_region <- NA
 
+## Add attributes info for Ref
+ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
+ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
+ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
+#View(ref@data)
+
+
+
+## Add subregion information to attributes table for PIZ
 piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
                                 piz@data$area_numbe == "501/2",
                                 "Thames Offshore",
-                          ifelse(piz@data$area_numbe == "447"|
+                        ifelse(piz@data$area_numbe == "447"|
                                 piz@data$area_numbe == "509/1"|
                                 piz@data$area_numbe == "509/2"|
                                 piz@data$area_numbe == "510/1"|
                                 piz@data$area_numbe == "510/2",
                                 "Thames South",
-                          ifelse(piz@data$area_numbe == "498"|
+                        ifelse(piz@data$area_numbe == "498"|
                                 piz@data$area_numbe == "507/1"|
                                 piz@data$area_numbe == "507/2"|
                                 piz@data$area_numbe == "507/3"|
@@ -185,6 +185,7 @@ piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
                                       "Hastings",
                                 NA)))))))))))))
 
+## Add subregion information to attributes table for SIZ
 siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                siz@data$area_numbe == "501/2",
                               "Thames Offshore",
@@ -283,7 +284,7 @@ siz@data$sub_region <- ifelse(siz@data$area_numbe == "501/1"|
                                 "Hastings",
                                NA)))))))))))))
 
-View(siz@data)
+#View(siz@data)
 
 ## Plot only licences from WestIOW sub_region
 piz.wiow <- subset(piz, sub_region=="West IOW")
@@ -294,8 +295,8 @@ piz.owers<- subset(piz, sub_region=="Owers")
 plot(piz.owers)
 piz.hunoff <- subset(piz, sub_region=="Humber Offshore")
 plot(piz.hunoff)
-piz.hunins <- subset(piz, sub_region=="Humber Inshore")
-plot(piz.hunins)
+piz.humins <- subset(piz, sub_region=="Humber Inshore")
+plot(piz.humins)
 
 
 #### 3. IMPORT MONITORING DATA ####
@@ -315,25 +316,24 @@ colnames(mondat)[1] <- "Code"
 pts_m=SpatialPoints(mondat[,(10:9)], 
                   proj4string = CRS(proj4string(piz)))
 
-###############################################################################################################
-# 19/08/2019
 
-dim(mondat)
-## Identify Stations within different treatment categories
+
+#### 4. RETRIEVE INFO (FROM GIS LAYERS) BY SAMPLE ####
+
+## Extract data by sample
 pizgis=over(pts_m,piz) # PIZ
 sizgis=over(pts_m,siz) # SIZ
 contgis=over(pts_m,regions) # CONTEXT
 refgis=over(pts_m,ref) # REF
 
-## Add station codes to each of the above objects
-stations=mondat[,1]# make vector for station codes
-stations
+## Add station codes to extracted data
+stations=mondat[,1]# vector for station codes
 pizgis$Code <- stations
 sizgis$Code <- stations
 contgis$Code <- stations
 refgis$Code <- stations
 
-## Add treatment column with relevant group
+## Add Treatment column
 pizgis$Treatment <- "PIZ"
 sizgis$Treatment <- "SIZ"
 contgis$Treatment <- "REF"
@@ -343,12 +343,11 @@ refgis$Treatment <- "REF"
 pizgis2 <- pizgis[!is.na(pizgis$area_numb),] # PIZ, remove NAs
 dim(pizgis2)#206
 
-
-## 2 step process for SIZ: 1.  Remove records with no area (i.e. Context and Ref)
+## 2 step process for SIZ: i).  Remove records with no area (i.e. Context and Ref)
 sizgis2 <- sizgis[!is.na(sizgis$area_numb),]
 dim(sizgis2)#411
 
-## 2. Remove records any stations which are also present in the PIZ object
+## ii) Remove records any stations which are also present in the PIZ object
 sizgis3 <-sizgis2[!sizgis2$Code %in% pizgis2$Code, , drop = FALSE]
 dim(sizgis3)#206
 
@@ -394,7 +393,10 @@ treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
 
 ## Order object 'treatall' by Code so it's ready ro cbind to monitoring data
 treatall2=treatall[order(treatall$Code),]
- 
+
+
+
+#### 5. IMPORT BASELINE DATA ####
 ## Bring in  SC baseline data and match to monitoring data
 basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
@@ -407,7 +409,10 @@ basdat$time="b"
 colnames(basdat)[1] <- "Code"
 #View(basdat)
 
-#### PIZ MATCHED MONITORING AND BASELINE DATA ####
+
+
+#### 6. MATCH MONITORING AND BASELINE DATA ####
+
 ## Select baseline samples where there is an accompanying monitoring sample
 basdat2=basdat %>%
   filter(Code %in% mondat$Code)
@@ -429,7 +434,6 @@ data=rbind(basdat2,mondat2)
 dim(data)#514
 
 
-
 ## Now stack treatall2 on treatall2 so this object can be joinied to df data (m and b)
 treatall3=rbind(treatall2,treatall2)
 dim(treatall3)
@@ -449,28 +453,28 @@ data2$site <- paste(data2$Area,data2$Treatment)
 
 ## Drop cols Treatment and Area_Numbe from df data 2
 names(data2)
-data3=data2[,c(1,6:12,15,16)]
+data3=data2[,c(1,6:12,15,16,2:4)]
 names(data3)
 
 ## Check and update col types
 str(data3)
 data3$site=as.factor(data3$site)
 data3$time=as.factor(data3$time)
-
+data3$Treatment=as.factor(data3$Treatment)
 names(data3)
-
-
+str(data3)
+## Get dat
 
 #############################################################
 
 #### PIZ SED SUMMARY BASELINE/MONITORING ####
 ## Get summary data by area
 #library(plyr)
-detach("package:plyr", unload=TRUE) 
+#detach("package:plyr", unload=TRUE) 
 #library(dplyr)
 
 ## Data by Area
-sumdata=data3%>%
+sumdata=data3[1:10]%>%
   group_by(site,time) %>%
   summarise(
     count = n(),
@@ -488,12 +492,12 @@ View(sumdata)
 
 ######################################################################################################################
 #20/0/2019
-#### PIZ WILCOX TESTS ####
+#### PIZ WILCOX TESTS  4 SITES ####
 ## Take relevant columns
 names(data3)
 ## Take relevant columns
 data4=data3[,c(10:9,2:8)]
-data4
+str(data4)
 
 ## Creat a vector for site
 site = as.character(data4$site)
@@ -547,215 +551,37 @@ pmatrix2$fS=round(pmatrix2$fS,3)
 pmatrix2$SC=round(pmatrix2$SC,3)
 pmatrix2
 
-
-
-
-
-
-
-
-
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-#### 4. MONITORING DATA: PIZ ####
-## Plot monitoring data points on PIZ polygons
-plot(piz, axes = TRUE)
-points(pts_m,col = "blue", cex = 0.4,pch=20)
-
-## Identify sample locations (for each record (i.e. sample) output relevant row of PIZ attribute table)
-mondat2=over(pts_m, piz)
-#View(mondat2)
-
-## Stitch together monitoring data and piz attributes table
-dim(mondat2)
-mondat3=cbind(mondat,mondat2)
-#View(mondat3)
-dim(mondat3)#550 20
-
-## Remove any samples not within a PIZ
-mondat4=mondat3[!is.na(mondat3$area_numbe),]
-dim(mondat4)# 206 20
-#View(mondat4)
-
-## Plot df 'test3' to make sure all samples are within PIZ extents
-pts_m2=SpatialPoints(mondat4[,(10:9)], 
-                     proj4string = CRS(proj4string(piz)))
-plot(piz, axes = TRUE)
-points(pts_m2,col = "blue", cex = 0.4,pch=20)
-
-
-#### BASELINE DATA: PIZ ####
-## Bring in  SC baseline data
-basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
-basdat
-dim(basdat)# 771  10
-
-## Add col for 'time' (Baseline or Monitoring)
-basdat$time="b"
-
-## Change name of col1 to 'Code'
-colnames(basdat)[1] <- "Code"
-#View(basdat)
-
-## Create a df for monitoring positions
-pts_b=SpatialPoints(basdat[,(10:9)], 
-                  proj4string = CRS(proj4string(piz)))
-
-## Plot monitoring data points on PIZ polygons
-plot(piz, axes = TRUE)
-points(pts_b,col = "red", cex = 0.4,pch=20)
-
-## Identify sample locations
-basdat2=over(pts_b, piz)
-#View(basdat2)
-basdat3=cbind(basdat,basdat2)
-#View(basdat3)
-dim(basdat3)#771 20
-
-## Remove any samples not within a PIZ
-basdat4=basdat3[!is.na(basdat3$area_numbe),]
-dim(basdat4)# 265 20
-#View(basdat4)
-
-## Plot df 'test_b3' to make sure all samples are within PIZ extents
-pts_b2=SpatialPoints(basdat4[,(10:9)], 
-                    proj4string = CRS(proj4string(piz)))
-plot(piz, axes = TRUE)
-points(pts_b2,col = "red", cex = 0.4,pch=20)
-
-
-#### PIZ MATCHED MONITORING AND BASELINE DATA ####
-## Select baseline samples where there is an accompanying monitoring sample
-basdat5=basdat4 %>%
-  filter(Code %in% mondat4$Code)
-dim(basdat5)# 203 20
-#View(basdat5)
-
-## Make sure there are no stations in the monitoring set without a corresponding baseline station
-mondat5=mondat4 %>%
-  filter(Code %in% basdat5$Code)
-mondat5
-dim(mondat5)
-#View(mondat2)
-
-## Now join the baseline df to the monitoring df
-data=rbind(basdat5,mondat5)
-View(data)
-
-## Add column for PIZ
-data$Treatment="PIZ"
-
-
-
-######################################################################
-## Now stack samples so repeated for subregions
-
-## Create a copy of object 'data' containing baseline and mon samples
-data.sub=data
-names(data.sub)
-View(data.sub)
-## Change area_numbe to sub_region
-data.sub$area_numbe <- data.sub$sub_region
-
-data.all=data
-data.all$area_numbe <- "All"
-View(data.All)
-
-## Now join together objects 'data' and data.copy'
-data=rbind(data,data.sub,data.all)
-dim(data)
-dim(data.sub)
-dim(data.all)
-######################################################################
-## Just take the required columns from df data (Code, seds, time, area_numbe,Treatment)
-names(data)
-str(data)
-data2=data[,c(1:8,11,16,31)]
-#View(data2)
-names(data2)
-
-## Create a col for Licence no. and PIZ
-data2$site <- paste(data2$area_numbe,data2$Treatment)
-
-## Drop cols Treatment and Area_Numbe from df data 2
-data3=data2[,c(1:9,12)]
-#View(data3)
-
-## Check and update col types
-str(data3)
-data3$site=as.factor(data3$site)
-data3$time=as.factor(data3$time)
-#View(data3)
-###################################################################
-
-
-
-## Create a copy of df data3 to allow for calc of means by all sites
-#data3copy=data3
-
-## Change all values in col 'site' to 'all'
-#data3copy$site <- "All PIZ"
-#View(data3copy)
-
-## Now join df for site piz samples together with df for all piz samples
-#data4 <- rbind(data3,data3copy)
-
-##############################################################
-#### PIZ SED SUMMARY BASELINE/MONITORING ####
-## Get summary data by area
-#library(plyr)
-detach("package:plyr", unload=TRUE) 
-#library(dplyr)
-sumdata=data3%>%
-  group_by(site,time) %>%
-  summarise(
-    count = n(),
-    sc = mean(SC, na.rm = TRUE),  
-    fS = mean(fS, na.rm = TRUE),
-    mS = mean(mS, na.rm = TRUE),
-    cS = mean(cS, na.rm = TRUE),
-    fG = mean(fG, na.rm = TRUE),
-    mG = mean(mG, na.rm = TRUE),
-    cG = mean(cG, na.rm = TRUE))
-sumdata
-#View(sumdata)
-
-
-#### PIZ WILCOX TESTS ####
+#### PIZ WILCOX TESTS  4 TREATMENT ####
 ## Take relevant columns
-data5=data3[,c(10:9,2:8)]
-#View(data5)
-str(data5)
-#####################################################
+names(data3)
+str(data3)
+## Take relevant columns
+data4=data3[,c(13,9,2:8)]
+str(data4)
+View(data4)
 
-
-#################################################
-## Create a vector for site
-site = as.character(data5$site)
-
+## Creat a vector for site
+#site = as.character(data4$Treatment)
+site = data4$Treatment
+str(data4)
 ## Identify the number of sites for each site
 table(site)
 
 ## Vector for site names
-site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ",
-               "395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ",
-               "435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ",
-               "488 PIZ", "500/3 PIZ","All PIZ","EastIOW PIZ","Hastings PIZ","Owers PIZ","WestIOW PIZ")
+#site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ","395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ","435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ","488 PIZ", "500/3 PIZ")
+
+#site.names <- levels(as.factor(data4$Treatment))
+site.names <- levels(data4$Treatment)
 
 ## Number of sites
-nsites = length(site.names)# 17
+nsites = length(site.names)# 16
 
 ## Matrix for p-values
 pmatrix = matrix(999, ncol=7, nrow=nsites)
 
 ## You just do a loop over the N sites. Select out the rows for the jth site (j=1 to N) on each iteration of the loop. And then do the Wilcoxon tests for that site
 for (j in 1:nsites) {
-  use = data5[site==site.names[j],]
+  use = data4[site==site.names[j],]
   for (k in 3:9) {
     varb = use[,k][use$time=="b"]
     varm = use[,k][use$time=="m"]
@@ -789,6 +615,20 @@ pmatrix2$mS=round(pmatrix2$mS,3)
 pmatrix2$fS=round(pmatrix2$fS,3)
 pmatrix2$SC=round(pmatrix2$SC,3)
 pmatrix2
+
+
+
+
+
+
+
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
 
 
 #### PIZ CBIND SUMMARY AND WILCOX TEST ####
