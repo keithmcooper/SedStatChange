@@ -461,17 +461,28 @@ str(data3)
 data3$site=as.factor(data3$site)
 data3$time=as.factor(data3$time)
 data3$Treatment=as.factor(data3$Treatment)
+data3$Sub_region=as.factor(data3$Sub_region)
 names(data3)
 str(data3)
 ## Get dat
 
 #############################################################
+#21/08/2019
+
+data3mod=data3
+data3mod$site <- data3mod$Treatment
+datatest=rbind(data3,data3mod)
+dim(datatest)
+names(datatest)
+
+data3=datatest
+#############################################################
 
 #### PIZ SED SUMMARY BASELINE/MONITORING ####
 ## Get summary data by area
 #library(plyr)
-#detach("package:plyr", unload=TRUE) 
-#library(dplyr)
+detach("package:plyr", unload=TRUE) 
+library(dplyr)
 
 ## Data by Area
 sumdata=data3[1:10]%>%
@@ -550,78 +561,7 @@ pmatrix2$mS=round(pmatrix2$mS,3)
 pmatrix2$fS=round(pmatrix2$fS,3)
 pmatrix2$SC=round(pmatrix2$SC,3)
 pmatrix2
-
-#### PIZ WILCOX TESTS  4 TREATMENT ####
-## Take relevant columns
-names(data3)
-str(data3)
-## Take relevant columns
-data4=data3[,c(13,9,2:8)]
-str(data4)
-View(data4)
-
-## Creat a vector for site
-#site = as.character(data4$Treatment)
-site = data4$Treatment
-str(data4)
-## Identify the number of sites for each site
-table(site)
-
-## Vector for site names
-#site.names = c("127 PIZ", "137 PIZ", "340 PIZ", "351 PIZ", "372/1 PIZ","395/1 PIZ", "395/2 PIZ", "396/1 PIZ", "407 PIZ","435/1 PIZ", "435/2 PIZ", "451 PIZ", "453 PIZ", "460 PIZ","488 PIZ", "500/3 PIZ")
-
-#site.names <- levels(as.factor(data4$Treatment))
-site.names <- levels(data4$Treatment)
-
-## Number of sites
-nsites = length(site.names)# 16
-
-## Matrix for p-values
-pmatrix = matrix(999, ncol=7, nrow=nsites)
-
-## You just do a loop over the N sites. Select out the rows for the jth site (j=1 to N) on each iteration of the loop. And then do the Wilcoxon tests for that site
-for (j in 1:nsites) {
-  use = data4[site==site.names[j],]
-  for (k in 3:9) {
-    varb = use[,k][use$time=="b"]
-    varm = use[,k][use$time=="m"]
-    pmatrix[j,(k-2)] = wilcox.test(varb ,varm, alt="two.sided",paired=T)$p.value
-  }
-}
-
-round(pmatrix,3)
-## Change pmatrix from a matrix to a dataframe
-pmatrix=as.data.frame(pmatrix)
-pmatrix
-
-## Add in column names
-colnames(pmatrix)=c("cG","mG","fG","cS","mS","fS","SC")
-pmatrix
-
-## Add in row names (site)
-pmatrix$site=site.names
-pmatrix
-
-## Change order of df
-pmatrix2=pmatrix[,c(8,1:7)]
-pmatrix2
-
-## Round p-values to 3 dp
-pmatrix2$cG=round(pmatrix2$cG,3)
-pmatrix2$mG=round(pmatrix2$mG,3)
-pmatrix2$fG=round(pmatrix2$fG,3)
-pmatrix2$cS=round(pmatrix2$cS,3)
-pmatrix2$mS=round(pmatrix2$mS,3)
-pmatrix2$fS=round(pmatrix2$fS,3)
-pmatrix2$SC=round(pmatrix2$SC,3)
-pmatrix2
-
-
-
-
-
-
-
+View(pmatrix2)
 ###############################################################################################################
 ###############################################################################################################
 ###############################################################################################################
