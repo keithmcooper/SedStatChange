@@ -691,11 +691,11 @@ class(sumdata_m)
 class(pmatrix2)
 
 ## Stitch together the results of Wilcox tests (df pmatrix2) with baseline and monitoring sed percentages
-piz_pvalues_means=cbind(pmatrix2,sumdata_b,sumdata_m)
+piz_pvalues_means=cbind(sumdata_b,sumdata_m,pmatrix2)
 View(piz_pvalues_means)
 ## Change col names
 names(piz_pvalues_means)
-colnames(piz_pvalues_means)=c("site","cG_p","mG_p","fG_p","cS_p","mS_p","fS_p","SC_p","site","time","count","sc_b","fS_b","mS_b","cS_b","fG_b","mG_b","cG_b","site","time",  "count","sc_m","fS_m","mS_m","cS_m","fG_m","mG_m","cG_m")
+colnames(piz_pvalues_means)=c("site","time","count","sc_b","fS_b","mS_b","cS_b","fG_b","mG_b","cG_b","site","time",  "count","sc_m","fS_m","mS_m","cS_m","fG_m","mG_m","cG_m","site","cG_p","mG_p","fG_p","cS_p","mS_p","fS_p","SC_p")
 
 #View(piz_pvalues_means)
 names(piz_pvalues_means)
@@ -706,7 +706,9 @@ names(piz_pvalues_means)
 ## Get cols in sensible order
 #piz_pvalues_means2=piz_pvalues_means[c(n_row,1:n_row-1),c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
 #piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
-piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12:18,22:28)]
+#piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12:18,22:28)]
+piz_pvalues_means2=piz_pvalues_means[,c(1,3,4:10,14:20,28:22)]
+
 View(piz_pvalues_means2)
 
 ## Calculate change in sed fractions between baseline and monitoring
@@ -739,6 +741,10 @@ pizchange$fG_change=round(pizchange$fG_change,1)
 pizchange$mG_change=round(pizchange$mG_change,1)
 pizchange$cG_change=round(pizchange$cG_change,1)
 
+## change order ofcols
+names(pizchange)
+pizchange=pizchange[,c(1:16,24:30,17:23)]
+
 ## Create a nice table
 View(pizchange)
 pizchange2 <- pizchange
@@ -765,7 +771,7 @@ names(pizchange2)
 
 #################################
 ft <- flextable(pizchange2,col_keys=c(
-"site" ,     "count",     "SC_p" ,     "fS_p",      "mS_p",      "cS_p" ,     "fG_p" ,     "mG_p" ,    "cG_p",      "sc_b",      "fS_b",      "mS_b",      "cS_b",      "fG_b" ,     "mG_b",      "cG_b"  ,"sc_m",      "fS_m",      "mS_m" ,     "cS_m",      "fG_m" ,     "mG_m" ,     "cG_m",      "sc_change","fS_change", "mS_change", "cS_change" ,"fG_change" ,"mG_change" ,"cG_change"))
+ "sc_b",      "fS_b",      "mS_b",      "cS_b",      "fG_b" ,     "mG_b",      "cG_b"  ,"sc_m",      "fS_m",      "mS_m" ,     "cS_m",      "fG_m" ,     "mG_m" ,     "cG_m",      "sc_change","fS_change", "mS_change", "cS_change" ,"fG_change" ,"mG_change" ,"cG_change","site" ,"count",     "SC_p" ,     "fS_p",      "mS_p",      "cS_p" ,     "fG_p" ,     "mG_p" ,    "cG_p"))
 
 ###########################
 
@@ -793,13 +799,14 @@ ft <- flextable(pizchange2,col_keys=c(
 #ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
 #ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
 ft <- set_header_labels(ft,site="Site",count="n",
-                        SC_p="SC",fS_p="fS",mS_p="mS",cS_p="cS",fG_p="fG",mG_p="mG",cG_p="cG",
+                        
                         sc_b="SC",fS_b="fS",mS_b="mS",cS_b="cS",fG_b="fG",mG_b="mG",cG_b="cG",
                         sc_m="SC",fS_m="fS",mS_m="mS",cS_m="cS",fG_m="fG",mG_m="mG",cG_m="cG",
-                        sc_change="SC",fS_change="fS",mS_change="mS",cS_change="cS",fG_change="fG",mG_change="mG",cG_change="cG")
+                        sc_change="SC",fS_change="fS",mS_change="mS",cS_change="cS",fG_change="fG",mG_change="mG",cG_change="cG",
+                        SC_p="SC",fS_p="fS",mS_p="mS",cS_p="cS",fG_p="fG",mG_p="mG",cG_p="cG")
 
 ## Add secondary header row
-ft <- add_header_row(ft, values=c("","","P-values","","","","","","","Baseline","","","","","","","Monitoring","","","","","","","Change","","","","","",""),top=TRUE)
+ft <- add_header_row(ft, values=c("","","Baseline","","","","","","","Monitoring","","","","","","","Change","","","","","","","P-values","","","","","",""),top=TRUE)
 
 ## Add table description
 ft <- add_header_lines(ft,values=c("Table. 1. P-values and change in sediment composition by fraction between baseline and 2018 monitoring"))
