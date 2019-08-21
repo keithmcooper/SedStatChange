@@ -770,8 +770,8 @@ ft <- flextable(pizchange2)
 names(pizchange2)
 
 #################################
-ft <- flextable(pizchange2,col_keys=c(
- "sc_b",      "fS_b",      "mS_b",      "cS_b",      "fG_b" ,     "mG_b",      "cG_b"  ,"sc_m",      "fS_m",      "mS_m" ,     "cS_m",      "fG_m" ,     "mG_m" ,     "cG_m",      "sc_change","fS_change", "mS_change", "cS_change" ,"fG_change" ,"mG_change" ,"cG_change","site" ,"count",     "SC_p" ,     "fS_p",      "mS_p",      "cS_p" ,     "fG_p" ,     "mG_p" ,    "cG_p"))
+ft <- flextable(pizchange2,col_keys=c("site" ,"count",
+ "sc_b",      "fS_b",      "mS_b",      "cS_b",      "fG_b" ,     "mG_b",      "cG_b"  ,"sc_m",      "fS_m",      "mS_m" ,     "cS_m",      "fG_m" ,     "mG_m" ,     "cG_m",      "sc_change","fS_change", "mS_change", "cS_change" ,"fG_change" ,"mG_change" ,"cG_change",     "SC_p" ,     "fS_p",      "mS_p",      "cS_p" ,     "fG_p" ,     "mG_p" ,    "cG_p"))
 
 ###########################
 
