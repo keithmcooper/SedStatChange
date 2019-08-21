@@ -704,9 +704,9 @@ names(piz_pvalues_means)
 #n_row=nrow(piz_pvalues_means)
 
 ## Get cols in sensible order
-piz_pvalues_means2=piz_pvalues_means[c(n_row,1:n_row-1),c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
-piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
-
+#piz_pvalues_means2=piz_pvalues_means[c(n_row,1:n_row-1),c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
+#piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12,22,13,23,14,24,15,25,16,26,17,27,18,28)]
+piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12:18,22:28)]
 View(piz_pvalues_means2)
 
 ## Calculate change in sed fractions between baseline and monitoring
@@ -721,7 +721,8 @@ piz_pvalues_means2$cG_change <- piz_pvalues_means2$cG_m-piz_pvalues_means2$cG_b
 
 ## Take cols of interest: change and p-values
 str(piz_pvalues_means2)
-pizchange <- piz_pvalues_means2[,c(1:9,24:30)]
+#pizchange <- piz_pvalues_means2[,c(1:9,24:30)]
+pizchange <- piz_pvalues_means2
 View(pizchange)
 
 ## get into order by n
@@ -739,21 +740,12 @@ pizchange$mG_change=round(pizchange$mG_change,1)
 pizchange$cG_change=round(pizchange$cG_change,1)
 
 ## Create a nice table
-
+View(pizchange)
 pizchange2 <- pizchange
-colnames(pizchange2) <- c("Site", "n","SCp", "fSp", "mSp", "cSp", "fGp", "mGp", "cGp", "SC", "fS", "mS", "cS", "fG", "mG", "cG")
+#colnames(pizchange2) <- c("Site", "n","SCp", "fSp", "mSp", "cSp", "fGp", "mGp", "cGp", "SC", "fS", "mS", "cS", "fG", "mG", "cG","SC", "fS", "mS", "cS", "fG", "mG", "cG","SC", "fS", "mS", "cS", "fG", "mG", "cG")
 #pizchange2 <- pizchange2[,c(1:2,10,3,11,4,12,5,13,6,14,7,15,8,16,9)]
 View(pizchange2)
 
-## pUT P-VALES IN BRACKETS
-#pizchange2[,4] <- paste0("(", format(unlist(pizchange2[,4])),")")
-#pizchange2[,6] <- paste0("(", format(unlist(pizchange2[,6])),")")
-#pizchange2[,8] <- paste0("(", format(unlist(pizchange2[,8])),")")
-#pizchange2[,10] <- paste0("(", format(unlist(pizchange2[,10])),")")
-#pizchange2[,12] <- paste0("(", format(unlist(pizchange2[,12])),")")
-#pizchange2[,14] <- paste0("(", format(unlist(pizchange2[,14])),")")
-#pizchange2[,16] <- paste0("(", format(unlist(pizchange2[,16])),")")
-#################################################################
 #### nICE TABLE FOR REPORTING PIZ DATA ####
 
 # https://cran.r-project.org/web/packages/flextable/vignettes/layout.html#manage-headers-and-footers
@@ -768,27 +760,39 @@ library(officer)
 #class(pizchange2)
 #names(piztab)
 #piztab <- flextable(pizchange2,col_keys=c("Site", "n","SC(p)", "fS(p)", "mS(p)", "cS(p)", "fG(p)", "mG(p)", "cG(p)", "SC", "fS", "mS", "cS", "fG", "mG", "cG"))
+ft <- flextable(pizchange2)
+names(pizchange2)
 
+#################################
 ft <- flextable(pizchange2,col_keys=c(
-                         "Site",
-                         "n",
-                         "SCp",
-                         "fSp",
-                         "mSp",
-                         "cSp",
-                         "fGp",
-                         "mGp",
-                         "cGp",
-                         "SC",
-                         "fS",
-                         "mS",
-                         "cS",
-                         "fG",
-                         "mG",
-                         "cG"))
-## Change row names
-ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
+"site" ,     "count",     "SC_p" ,     "fS_p",      "mS_p",      "cS_p" ,     "fG_p" ,     "mG_p" ,    "cG_p",      "sc_b",      "fS_b",      "mS_b",      "cS_b",      "fG_b" ,     "mG_b",      "cG_b"  ,"sc_m",      "fS_m",      "mS_m" ,     "cS_m",      "fG_m" ,     "mG_m" ,     "cG_m",      "sc_change","fS_change", "mS_change", "cS_change" ,"fG_change" ,"mG_change" ,"cG_change"))
 
+###########################
+
+
+
+#ft <- flextable(pizchange2,col_keys=c(
+#                         "Site",
+#                         "n",
+#                         "SCp",
+#                         "fSp",
+ #                        "mSp",
+ #                        "cSp",
+ #                        "fGp",
+ #                        "mGp",
+ #                        "cGp",
+ #                        "SC",
+ #                        "fS",
+ #                        "mS",
+ #                        "cS",
+ #                        "fG",
+ #                        "mG",
+ #                        "cG"))
+
+## Change row names
+#ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
+ft <- set_header_labels(ft,SCp="SC",fSp="fS",mSp="mS", cSp="cS", fGp="fG", mGp="mG", cGp="cG")
+"site","count","SC_p","fS_p","mS_p","cS_p","fG_p","mG_p","cG_p","sc_b","fS_b","mS_b","cS_b","fG_b","mG_b","cG_b","sc_m","fS_m","mS_m","cS_m","fG_m","mG_m","cG_m","sc_change","fS_change","mS_change","cS_change","fG_change","mG_change","cG_change"
 ## Add secondary header row
 ft <- add_header_row(ft, values=c("","","P-values","","","","","","","Change","","","","","",""),top=TRUE)
 
@@ -826,6 +830,10 @@ ft <- align(ft,align="left", part="body")
 ## Align text in Site column
 #ft <- align_text_col(ft, align = "left")
 #ft <- align_nottext_col(ft, align = "right")
+
+ft=hline(ft, 1:5, j = 1:3, border = NULL, part = "body")
+
+
 ft
 
 
