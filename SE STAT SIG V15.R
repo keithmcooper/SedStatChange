@@ -562,6 +562,66 @@ pmatrix2$fS=round(pmatrix2$fS,3)
 pmatrix2$SC=round(pmatrix2$SC,3)
 pmatrix2
 View(pmatrix2)
+
+
+## Reorder rows
+
+target <- pmatrix2$site
+target
+## Change order of treatments
+target <- c("PIZ",
+            "127 PIZ",    
+            "137 PIZ",
+            "340 PIZ",
+             "351 PIZ",
+            "372/1 PIZ",
+            "395/1 PIZ",
+            "395/2 PIZ",
+            "396/1 PIZ", 
+            "407 PIZ",
+            "435/1 PIZ",
+            "435/2 PIZ",
+           "451 PIZ",
+           "460 PIZ",
+           "488 PIZ",
+           "500/3 PIZ",
+            
+            "SIZ",
+            "127 SIZ",
+            "137 SIZ",
+            "340 SIZ",
+           "351 SIZ",
+           "372/1 SIZ",
+           "395/1 SIZ",
+           "395/2 SIZ",
+           "396/1 SIZ",
+            "407 SIZ",
+            "435/1 SIZ",
+            "435/2 SIZ",
+            "451 SIZ", 
+            "453 PIZ",  
+            "460 SIZ",
+            "488 SIZ", 
+            "500/3 SIZ",
+          
+          "REF",
+          "Context REF",
+            "Box 1 REF", 
+            "Box 2 REF", 
+            "Box 3 REF", 
+            "Box 4 REF", 
+            "Box 5 REF", 
+            "Box 6 REF" 
+             
+            )
+
+require(gdata)
+pmatrix2$site <- reorder.factor(pmatrix2$site, new.order=target)
+require(dplyr)
+pmatrix3 <- pmatrix2 %>%
+  arrange(site)
+
+View(pmatrix3)
 ###############################################################################################################
 ###############################################################################################################
 ###############################################################################################################
