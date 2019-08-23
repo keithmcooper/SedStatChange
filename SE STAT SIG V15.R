@@ -890,7 +890,6 @@ ft <- align(ft,align="left", part="body")
 
 #ft=hline(ft, 1:5, j = 1:3, border = NULL, part = "body")
 
-
 ft
 
 
