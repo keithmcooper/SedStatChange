@@ -61,9 +61,9 @@ writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
+subreg <- readOGR("DATA/sub_region.shp")
 regions<-readOGR("DATA/regions2.shp")
 ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
-subreg <- readOGR("DATA/sub_region.shp")
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
@@ -325,9 +325,11 @@ pts_m=SpatialPoints(mondat[,(10:9)],
 pizgis=over(pts_m,piz) # PIZ
 sizgis=over(pts_m,siz) # SIZ
 contgis=over(pts_m,regions) # CONTEXT
-contsrgis=over(pts_m,subreg)
-contgis <- cbind(contgis,contsrgis$sub_region)
-colnames(contgis)[4] <- "sub_region"
+contsrgis=over(pts_m,subreg)# CONTEXT get sub region
+contgis <- cbind(contgis,contsrgis)# CONTEXT append sub_region
+head(contgis2)
+contgis <- contgis[,c(2,5)]
+
 names(contgis)
 refgis=over(pts_m,ref) # REF
 
@@ -341,7 +343,8 @@ refgis$Code <- stations
 ## Add Treatment column
 pizgis$Treatment <- "PIZ"
 sizgis$Treatment <- "SIZ"
-contgis$Treatment <- "REF"
+#contgis$Treatment <- "REF"
+contgis$Treatment <- "CONTEXT"
 refgis$Treatment <- "REF"
 
 ## Remove records from above objects that are not relevant (i.e. not associated with the relevant treatment)
@@ -365,6 +368,7 @@ contgis2 <- contgis[!contgis$Code %in% pizgis2$Code, , drop = FALSE]#remove piz 
 contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove siz stations
 contgis4 <- contgis3[!contgis3$Code %in% refgis2$Code, , drop = FALSE]#remove ref stations
 dim(contgis4)
+View(contgis4)
 
 ## Now make sure all GIS query objects have required fields: Code, Region, Sub-region, Treatment, Area
 # PIZ
@@ -382,16 +386,27 @@ names(refgis2)
 refgis3 <- refgis2[,c(5,3,4,6,2)]
 names(refgis3)
 colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
+#View(refgis3)
 
 # CONTEXT
 names(contgis4)
-contgis5 <- contgis4[,c(5,2,4,6)]
+#contgis5 <- contgis4[,c(5,2,4,6)]
+contgis5 <- contgis4[,c(3,1,2,4)]
 colnames(contgis5) <- c("Code","Region","Sub_region","Treatment")
 #contgis5$Sub_region <- NA
-contgis5$Area <- "Context"
-contgis6=contgis5[,c(1,2,4,3,5)]
+#contgis5$Area <- "Context"
+contgis5$Area <- "Ref"
+contgis6=contgis5[,c(1,2,3,4,5)]
+
 names(contgis6)
 dim(contgis6)
+View(contgis6)
+
+## Fudge to correct region and sub-region info where regions overlap
+contgis6$Region[contgis6$Code=="SC_0265"] <- "South Coast"
+contgis6$Sub_region[contgis6$Code=="SC_0265"] <- "Hastings"
+
+
 
 ## Now bring GIS query objects together
 treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
@@ -441,18 +456,21 @@ dim(data)#514
 
 
 ## Now stack treatall2 on treatall2 so this object can be joinied to df data (m and b)
-View(treatall2)
+#View(treatall2)
 treatall3=rbind(treatall2,treatall2)
 dim(treatall3)
 
 ## only keep stations in treatall2 that are in data
 treatall4 <- treatall3 %>% semi_join(data, by = "Code") 
 dim(treatall4)
-#View(test)
+#View(treatall4)
 ## Now add mon and baseline sed data to gis treatment object
 data2 <- cbind(treatall4,data[,2:11])
 #View(data2)
 names(data2)
+str(data2)
+
+
 ###############################################################
 #20/08/2019
 ## Create a col for Licence no. and PIZ
@@ -475,7 +493,7 @@ str(data3)
 
 #############################################################
 #21/08/2019
-## Repeat data so outputs can be produced for PIZ, SIZ REF
+## Repeat data3 so outputs can be produced for PIZ, SIZ REF
 data3mod=data3
 data3mod$site <- data3mod$Treatment
 datatest=rbind(data3,data3mod)
@@ -487,88 +505,105 @@ data3sub <- data3
 data3sub$site <- paste(data3sub$Sub_region,data3sub$Treatment)
 datatest2=rbind(datatest,data3sub)
 data3=datatest2
-View(data3)
+#View(data3)
+dim(data3)
+## Remove Context Ref 
+dim(data3)
+data3$site=as.character(data3$site)
+str(data3)
+d <- with(data3, which(site=="Ref CONTEXT"))
+data3 <- data3[-d, ]
+data3$site=as.factor(data3$site)
+
+
 #############################################################
 ## 21/08/2019 pm Get object data3 into sensible order
 ## Reorder rows
 str(data3)
 target <- data3$site
 target
+lev <- levels(target)
+lev
 ## Change order of treatments
 
+target <- c("PIZ", "SIZ", "REF", "CONTEXT",
+            "West IOW PIZ","West IOW SIZ"  ,"West IOW REF"   , "West IOW CONTEXT" ,
+            "East IOW PIZ","East IOW SIZ" ,"East IOW REF","East IOW CONTEXT",
+            "Owers PIZ","Owers SIZ","Owers REF","Owers CONTEXT"  , 
+            "Hastings PIZ",  "Hastings SIZ"  ,  "Hastings REF","Hastings CONTEXT",                "127 PIZ" ,"127 SIZ", "137 PIZ" , "137 SIZ"  ,
+            "340 PIZ" ,"340 SIZ","351 PIZ"  , "351 SIZ" ,
+            "372/1 PIZ","372/1 SIZ" ,"395/1 PIZ", "395/1 SIZ" ,
+             "395/2 PIZ","395/2 SIZ" ,"396/1 PIZ"  ,"396/1 SIZ",
+            "407 PIZ","407 SIZ","435/1 PIZ","435/1 SIZ",
+            "435/2 PIZ","435/2 SIZ","451 PIZ","451 SIZ",
+            "453 PIZ" ,"460 PIZ","460 SIZ","488 PIZ" ,
+            "488 SIZ" ,"500/3 PIZ","500/3 SIZ","Box 1 REF" ,
+            "Box 2 REF","Box 3 REF","Box 4 REF"  ,"Box 5 REF",  
+             "Box 6 REF")#"Context CONTEXT",
 
-
-target <- c("PIZ",
-            "SIZ",
-            "REF",
-            
-            "West IOW PIZ",
-            "West IOW SIZ",
-            "West IOW REF",
-            "East IOW PIZ",
-            "East IOW SIZ",
-            "East IOW REF",
-            "Owers PIZ",
-            "Owers SIZ",
-            "Owers REF",
-            "Hastings PIZ",
-            "Hastings SIZ",
-            "Hastings REF",
-            "127 PIZ",    
-            "137 PIZ",
-            "340 PIZ",
-            "351 PIZ",
-            "372/1 PIZ",
-            "395/1 PIZ",
-            "395/2 PIZ",
-            "396/1 PIZ",
-            "407 PIZ",
-            "435/1 PIZ",
-            "435/2 PIZ",            
-            "451 PIZ",
-            "460 PIZ",
-            "488 PIZ",
-            "500/3 PIZ",
+#target <- c("PIZ",
+ #           "SIZ",
+  #          "REF",
+   #         
+    #        "West IOW PIZ",
+     #       "West IOW SIZ",
+      #      "West IOW REF",
             
             
+#            "East IOW PIZ",
+#            "East IOW SIZ",
+#           "East IOW REF",
+#           "Owers PIZ",
+#           "Owers SIZ",
+#           "Owers REF",
+#           "Hastings PIZ",
+#           "Hastings SIZ",
+#           "Hastings REF",
+#           "127 PIZ",    
+#           "137 PIZ",
+#           "340 PIZ",
+#           "351 PIZ",
+#           "372/1 PIZ",
+#           "395/1 PIZ",
+#           "395/2 PIZ",
+#           "396/1 PIZ",
+#           "407 PIZ",
+#           "435/1 PIZ",
+#           "435/2 PIZ",            
+#           "451 PIZ",
+#           "460 PIZ",
+#           "488 PIZ",
+#           "500/3 PIZ",
+       
+            
+#           "127 SIZ",
+#           "137 SIZ",
+#           "340 SIZ",
+#           "351 SIZ",
+#           "372/1 SIZ",
+#           "395/1 SIZ",
+#           "395/2 SIZ",
+#           "396/1 SIZ",
+#           "407 SIZ",
+#           "435/1 SIZ",
+#           "435/2 SIZ",
+#           "451 SIZ", 
+#           "453 PIZ",
+#           "460 SIZ",
+#           "488 SIZ",
+#           "500/3 SIZ",
             
             
+#           "NA REF" , 
+#           "Context REF",
+#           "Box 1 REF", 
+#           "Box 2 REF", 
+#           "Box 3 REF", 
+#           "Box 4 REF", 
+#           "Box 5 REF", 
+#           "Box 6 REF" 
             
-            
-            "127 SIZ",
-            "137 SIZ",
-            "340 SIZ",
-            "351 SIZ",
-            "372/1 SIZ",
-            "395/1 SIZ",
-            "395/2 SIZ",
-            "396/1 SIZ",
-            "407 SIZ",
-            "435/1 SIZ",
-            "435/2 SIZ",
-            "451 SIZ", 
-            "453 PIZ",
-            "460 SIZ",
-            "488 SIZ",
-            "500/3 SIZ",
-            
-            
-            
-            
-            
-            
-            
-            
-            "NA REF" , 
-            "Context REF",
-            "Box 1 REF", 
-            "Box 2 REF", 
-            "Box 3 REF", 
-            "Box 4 REF", 
-            "Box 5 REF", 
-            "Box 6 REF" 
-            
-)
+#)
 
 require(gdata)
 data3$site <- reorder.factor(data3$site, new.order=target)
@@ -576,9 +611,12 @@ require(dplyr)
 data4 <- data3 %>%
   arrange(site)
 
-View(data4)
+#View(data4)
 
 data3=data4
+#View(data3)
+levels(data3$site)
+str(data3)
 
 
 ##############################################
@@ -665,7 +703,7 @@ pmatrix2$mS=round(pmatrix2$mS,3)
 pmatrix2$fS=round(pmatrix2$fS,3)
 pmatrix2$SC=round(pmatrix2$SC,3)
 pmatrix2
-View(pmatrix2)
+#View(pmatrix2)
 
 
 
@@ -688,7 +726,7 @@ sumdata_m=sumdata[which(sumdata$time=="m"),]
 dim(sumdata_b)#16 10
 dim(sumdata_b)# 16 10
 dim(pmatrix2)# 16 8
-
+#View(sumdata_b)
 
 ## Make sure all objects are class df
 sumdata_b=as.data.frame(sumdata_b)#16 10
@@ -699,7 +737,7 @@ class(pmatrix2)
 
 ## Stitch together the results of Wilcox tests (df pmatrix2) with baseline and monitoring sed percentages
 piz_pvalues_means=cbind(sumdata_b,sumdata_m,pmatrix2)
-View(piz_pvalues_means)
+#View(piz_pvalues_means)
 ## Change col names
 names(piz_pvalues_means)
 colnames(piz_pvalues_means)=c("site","time","count","sc_b","fS_b","mS_b","cS_b","fG_b","mG_b","cG_b","site","time",  "count","sc_m","fS_m","mS_m","cS_m","fG_m","mG_m","cG_m","site","cG_p","mG_p","fG_p","cS_p","mS_p","fS_p","SC_p")
@@ -716,7 +754,7 @@ names(piz_pvalues_means)
 #piz_pvalues_means2=piz_pvalues_means[,c(1,11,8:2,12:18,22:28)]
 piz_pvalues_means2=piz_pvalues_means[,c(1,3,4:10,14:20,28:22)]
 
-View(piz_pvalues_means2)
+#View(piz_pvalues_means2)
 
 ## Calculate change in sed fractions between baseline and monitoring
 names(piz_pvalues_means2)
@@ -732,7 +770,7 @@ piz_pvalues_means2$cG_change <- piz_pvalues_means2$cG_m-piz_pvalues_means2$cG_b
 str(piz_pvalues_means2)
 #pizchange <- piz_pvalues_means2[,c(1:9,24:30)]
 pizchange <- piz_pvalues_means2
-View(pizchange)
+#View(pizchange)
 
 ## get into order by n
 class(pizchange)
@@ -753,11 +791,11 @@ names(pizchange)
 pizchange=pizchange[,c(1:16,24:30,17:23)]
 
 ## Create a nice table
-View(pizchange)
+#View(pizchange)
 pizchange2 <- pizchange
 #colnames(pizchange2) <- c("Site", "n","SCp", "fSp", "mSp", "cSp", "fGp", "mGp", "cGp", "SC", "fS", "mS", "cS", "fG", "mG", "cG","SC", "fS", "mS", "cS", "fG", "mG", "cG","SC", "fS", "mS", "cS", "fG", "mG", "cG")
 #pizchange2 <- pizchange2[,c(1:2,10,3,11,4,12,5,13,6,14,7,15,8,16,9)]
-View(pizchange2)
+#View(pizchange2)
 
 #### nICE TABLE FOR REPORTING PIZ DATA ####
 
