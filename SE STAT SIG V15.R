@@ -63,6 +63,7 @@ piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
 regions<-readOGR("DATA/regions2.shp")
 ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
+subreg <- readOGR("DATA/sub_region.shp")
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
@@ -73,7 +74,7 @@ plot(piz)
 plot(siz)
 plot(regions)
 plot(ref)
-
+plot(subreg)
 ## To see the attributes data
 piz@data
 #View(piz@data)
@@ -324,6 +325,10 @@ pts_m=SpatialPoints(mondat[,(10:9)],
 pizgis=over(pts_m,piz) # PIZ
 sizgis=over(pts_m,siz) # SIZ
 contgis=over(pts_m,regions) # CONTEXT
+contsrgis=over(pts_m,subreg)
+contgis <- cbind(contgis,contsrgis$sub_region)
+colnames(contgis)[4] <- "sub_region"
+names(contgis)
 refgis=over(pts_m,ref) # REF
 
 ## Add station codes to extracted data
@@ -380,12 +385,13 @@ colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # CONTEXT
 names(contgis4)
-contgis5 <- contgis4[,c(4,2,5)]
-colnames(contgis5) <- c("Code","Region","Treatment")
-contgis5$Sub_region <- NA
+contgis5 <- contgis4[,c(5,2,4,6)]
+colnames(contgis5) <- c("Code","Region","Sub_region","Treatment")
+#contgis5$Sub_region <- NA
 contgis5$Area <- "Context"
 contgis6=contgis5[,c(1,2,4,3,5)]
 names(contgis6)
+dim(contgis6)
 
 ## Now bring GIS query objects together
 treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
@@ -393,7 +399,7 @@ treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
 
 ## Order object 'treatall' by Code so it's ready ro cbind to monitoring data
 treatall2=treatall[order(treatall$Code),]
-
+#View(treatall2)
 
 
 #### 5. IMPORT BASELINE DATA ####
@@ -435,12 +441,13 @@ dim(data)#514
 
 
 ## Now stack treatall2 on treatall2 so this object can be joinied to df data (m and b)
+View(treatall2)
 treatall3=rbind(treatall2,treatall2)
 dim(treatall3)
 
 ## only keep stations in treatall2 that are in data
 treatall4 <- treatall3 %>% semi_join(data, by = "Code") 
-dim(test)
+dim(treatall4)
 #View(test)
 ## Now add mon and baseline sed data to gis treatment object
 data2 <- cbind(treatall4,data[,2:11])
