@@ -15,6 +15,106 @@ library(rgdal)
 library(maptools)
 library(plyr)
 
+######################################################################
+
+#### TO ACCESS ONEBENTHIC ON MY MACHINE ####
+#install.packages("RPostgreSQL")
+#require("RPostgreSQL")
+library ( RPostgres)
+library(DBI)
+## create a connection. Save the password
+pw <- {
+  "postgres1234"
+}
+logged= FALSE;
+
+## loads the PostgreSQL driver
+drv <- dbDriver("Postgres")
+
+## Creates a connection to the postgres database. Note that "con" will be used later in each connection to the database
+con =  dbConnect(drv, dbname = "OneBenthicDB",
+                 host = "localhost",
+                 port = 5433,
+                 user = "postgres",
+                 password = pw)
+rm(pw) # removes the password
+
+## See list of tables. Default is for public scheme
+dbListTables(con)
+
+## Does a tabloe exist?
+dbExistsTable(con, "taxa") # This table is not in the public scheme
+
+## To see a list of all schema
+dbGetQuery(con, "SELECT nspname FROM pg_catalog.pg_namespace")
+
+## List tables in a particular scheme
+dbGetQuery(con,"SELECT table_schema||'.'||table_name AS full_rel_name
+FROM information_schema.tables
+WHERE table_schema = 'faunal_data';")
+#or
+dbGetQuery(con,"SELECT * FROM pg_catalog.pg_tables where schemaname='faunal_data';")
+
+
+## To access data in table
+taxa = dbGetQuery(con, "select * from faunal_data.taxa")
+head(taxa)
+
+sample = dbGetQuery(con, "select * from sample")
+head(sample)
+names(sample)
+str(sample)
+
+plot(sample$samplelong,sample$samplelat)
+######################################################################
+#### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
+#install.packages("RPostgreSQL")
+#require("RPostgreSQL")
+library ( RPostgres)
+library(DBI)
+## create a connection. Save the password
+pw <- {
+  "inv@s1ve00!"
+}
+logged= FALSE;
+
+## loads the PostgreSQL driver
+drv <- dbDriver("Postgres")
+
+## Creates a connection to the postgres database. Note that "con" will be used later in each connection to the database
+con =  dbConnect(drv, dbname = "one_benthic",
+                 host = "azsclnxgis-ext01.postgres.database.azure.com",
+                 port = 5432,
+                 user = "kmc00_benthic_editor@azsclnxgis-ext01",
+                 password = pw)
+rm(pw) # removes the password
+
+## See list of tables. Default is for public scheme
+dbListTables(con)
+
+## Does a tabloe exist?
+dbExistsTable(con, "taxa") # This table is not in the public scheme
+
+## To see a list of all schema
+dbGetQuery(con, "SELECT nspname FROM pg_catalog.pg_namespace")
+
+## List tables in a particular scheme
+dbGetQuery(con,"SELECT table_schema||'.'||table_name AS full_rel_name
+           FROM information_schema.tables
+           WHERE table_schema = 'samples';")
+#or
+dbGetQuery(con,"SELECT * FROM pg_catalog.pg_tables where schemaname='samples';")
+
+
+## To access data in table
+sample = dbGetQuery(con, "select * from samples.sample")
+head(sample)
+names(sample)
+
+
+plot(sample$samplelong,sample$samplelat)
+
+###################################################################
 #### IMPORT POLYGONS FROM AWS ####
 #install.packages("RPostgreSQL")
 require("RPostgreSQL")
