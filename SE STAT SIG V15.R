@@ -95,6 +95,7 @@ dbListTables(con)
 ## Does a tabloe exist?
 dbExistsTable(con, "taxa") # This table is not in the public scheme
 
+
 ## To see a list of all schema
 dbGetQuery(con, "SELECT nspname FROM pg_catalog.pg_namespace")
 
