@@ -66,6 +66,28 @@ names(sample)
 str(sample)
 
 plot(sample$samplelong,sample$samplelat)
+
+## now get baseline sed data
+data = dbGetQuery(con, "SELECT
+sedvar_sievesize,
+percentage,
+samplecode,
+samplelat,
+samplelong,
+'year',
+stationcode
+FROM
+sample,
+sedvarsample,
+station,
+samplestation
+WHERE
+sample.samplecode=sedvarsample.sample_samplecode
+AND
+sample.samplecode=samplestation.sample_samplecode
+AND
+samplestation.station_stationcode= station.stationcode")
+View(data)
 ######################################################################
 #### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
 #install.packages("RPostgreSQL")
@@ -522,6 +544,8 @@ treatall2=treatall[order(treatall$Code),]
 ## Bring in  SC baseline data and match to monitoring data
 basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
+
+View(basdat)
 dim(basdat)# 771  10
 
 ## Add col for 'time' (b = Baseline)
