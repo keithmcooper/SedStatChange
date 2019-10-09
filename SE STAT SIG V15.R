@@ -100,14 +100,44 @@ data3
 View(data3)
 
 ## Change from long to wide format
-
-
 #https://www.bing.com/videos/search?q=tidyr+long+to+wide&&view=detail&mid=9397360FBC77F8AE08099397360FBC77F8AE0809&&FORM=VRDGAR
 library(tidyr)
 names(data3)
 ## long range to wide range: data, key (headers), values
 data4 <-spread(data3,sedvar_sievesize,percentage)
 View(data4)
+
+## Change column order
+names(data4)
+data5 <- data4[,c(2,5,3,4,100:6)]
+View(data5)
+
+## Change NAs to zero
+names(data5)
+data5[, 5:99][is.na(data5[, 5:99])] <- 0
+View(data5)
+## Add columns for major sediment fractions
+names(data5)
+str(data5)
+data5$cG <- rowSums(data5[,5:21])# 100.427 to 16
+data5$mG <- rowSums(data5[,22:25])# 11.314 to 8
+data5$fG <- rowSums(data5[,26:33])# 6.3 to 2 
+data5$cS <- rowSums(data5[,34:40])# 1.41 to 0.5
+data5$mS <- rowSums(data5[,41:47])# 0.43 to 0.25
+data5$fS <- rowSums(data5[,48:56])# 0.212 to 0.0625 
+data5$SC <- rowSums(data5[,57:99])# 0.0442 to 0 
+
+View(data5)
+
+## Get data into final forma
+names(data5)
+data6 <- data5[,c(1,100:106,3,4)]
+data6
+
+## Update column names
+colnames(data6)[9] <- "Lat"
+colnames(data6)[10] <- "Long"
+names(data6)
 ######################################################################
 #### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
 #install.packages("RPostgreSQL")
@@ -568,6 +598,12 @@ basdat
 View(basdat)
 dim(basdat)# 771  10
 
+##########################################################
+## added 09/10/2019 to use data from OneBenthicDB rather than import
+basdat <- data6 
+##########################################################
+
+
 ## Add col for 'time' (b = Baseline)
 basdat$time="b"
 
@@ -596,6 +632,8 @@ dim(mondat2)
 
 ## Now join the baseline df to the monitoring df
 data=rbind(basdat2,mondat2)
+
+
 #View(data)
 dim(data)#514
 
