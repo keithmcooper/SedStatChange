@@ -70,13 +70,13 @@ plot(sample$samplelong,sample$samplelat)
 
 ## now get baseline sed data
 data = dbGetQuery(con, "SELECT
+samplecode,
+stationcode,
 sedvar_sievesize,
 percentage,
-samplecode,
 samplelat,
 samplelong,
-'year',
-stationcode
+year
 FROM
 sample,
 sedvarsample,
@@ -89,6 +89,19 @@ sample.samplecode=samplestation.sample_samplecode
 AND
 samplestation.station_stationcode= station.stationcode")
 View(data)
+
+## Take oldest sample only
+dim(data)# 136972 7
+
+# convert data to a data.table
+require(data.table) 
+data2 <- as.data.table(data)
+data2
+names(data2)
+# Only keep stations with min year
+data3 <- data2[data2[, .I[year == min(year)], by=stationcode]$V1]
+data3
+View(data3)
 ######################################################################
 #### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
 #install.packages("RPostgreSQL")
