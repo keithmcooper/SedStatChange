@@ -90,18 +90,24 @@ AND
 samplestation.station_stationcode= station.stationcode")
 View(data)
 
-## Take oldest sample only
-dim(data)# 136972 7
-
-# convert data to a data.table
+## Change df to type data.table
 require(data.table) 
 data2 <- as.data.table(data)
-data2
-names(data2)
-# Only keep stations with min year
+
+## Only keep RSMP stations with lowest year
 data3 <- data2[data2[, .I[year == min(year)], by=stationcode]$V1]
 data3
 View(data3)
+
+## Change from long to wide format
+
+
+#https://www.bing.com/videos/search?q=tidyr+long+to+wide&&view=detail&mid=9397360FBC77F8AE08099397360FBC77F8AE0809&&FORM=VRDGAR
+library(tidyr)
+names(data3)
+## long range to wide range: data, key (headers), values
+data4 <-spread(data3,sedvar_sievesize,percentage)
+View(data4)
 ######################################################################
 #### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
 #install.packages("RPostgreSQL")
