@@ -90,32 +90,30 @@ AND
 samplestation.station_stationcode= station.stationcode")
 View(data)
 
-## Change df to type data.table
+## Convert to a data.table
 require(data.table) 
 data2 <- as.data.table(data)
 
-## Only keep RSMP stations with lowest year
+## Only keep the true baseline RSMP samples (i.e. those with lowest year)
 data3 <- data2[data2[, .I[year == min(year)], by=stationcode]$V1]
-data3
 View(data3)
 
-## Change from long to wide format
-#https://www.bing.com/videos/search?q=tidyr+long+to+wide&&view=detail&mid=9397360FBC77F8AE08099397360FBC77F8AE0809&&FORM=VRDGAR
+## Change data from long range to wide range: data, key (headers), values
 library(tidyr)
 names(data3)
-## long range to wide range: data, key (headers), values
 data4 <-spread(data3,sedvar_sievesize,percentage)
-View(data4)
+data4
 
 ## Change column order
 names(data4)
 data5 <- data4[,c(2,5,3,4,100:6)]
-View(data5)
+data5
 
 ## Change NAs to zero
 names(data5)
 data5[, 5:99][is.na(data5[, 5:99])] <- 0
 View(data5)
+
 ## Add columns for major sediment fractions
 names(data5)
 str(data5)
@@ -126,10 +124,9 @@ data5$cS <- rowSums(data5[,34:40])# 1.41 to 0.5
 data5$mS <- rowSums(data5[,41:47])# 0.43 to 0.25
 data5$fS <- rowSums(data5[,48:56])# 0.212 to 0.0625 
 data5$SC <- rowSums(data5[,57:99])# 0.0442 to 0 
+data5
 
-View(data5)
-
-## Get data into final forma
+## Get data into final format
 names(data5)
 data6 <- data5[,c(1,100:106,3,4)]
 data6
@@ -138,6 +135,10 @@ data6
 colnames(data6)[9] <- "Lat"
 colnames(data6)[10] <- "Long"
 names(data6)
+
+## Change name of baseline file so it works with code below
+basdat <- data6 
+
 ######################################################################
 #### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
 #install.packages("RPostgreSQL")
@@ -592,16 +593,13 @@ treatall2=treatall[order(treatall$Code),]
 
 #### 5. IMPORT BASELINE DATA ####
 ## Bring in  SC baseline data and match to monitoring data
-basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
+#basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
 
 View(basdat)
 dim(basdat)# 771  10
 
-##########################################################
-## added 09/10/2019 to use data from OneBenthicDB rather than import
-basdat <- data6 
-##########################################################
+
 
 
 ## Add col for 'time' (b = Baseline)
