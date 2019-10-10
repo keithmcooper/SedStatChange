@@ -43,7 +43,7 @@ rm(pw) # removes the password
 ## See list of tables. Default is for public scheme
 dbListTables(con)
 
-## Does a tabloe exist?
+## Does a table exist?
 dbExistsTable(con, "taxa") # This table is not in the public scheme
 
 ## To see a list of all schema
@@ -56,7 +56,6 @@ WHERE table_schema = 'faunal_data';")
 #or
 dbGetQuery(con,"SELECT * FROM pg_catalog.pg_tables where schemaname='faunal_data';")
 
-
 ## To access data in table
 taxa = dbGetQuery(con, "select * from faunal_data.taxa")
 head(taxa)
@@ -68,7 +67,7 @@ str(sample)
 
 plot(sample$samplelong,sample$samplelat)
 
-## now get baseline sed data
+## Get baseline sediment data from OneBenthic DB
 data = dbGetQuery(con, "SELECT
 samplecode,
 stationcode,
@@ -88,35 +87,35 @@ AND
 sample.samplecode=samplestation.sample_samplecode
 AND
 samplestation.station_stationcode= station.stationcode")
-View(data)
 
-## Convert to a data.table
+head(data) # print data
+
+## Convert object 'data' to a data.table
 require(data.table) 
 data2 <- as.data.table(data)
 
-## Only keep the true baseline RSMP samples (i.e. those with lowest year)
+## Query returns all samples associated with an RSMP station. Only keep the true baseline samples (i.e. those with lowest year)
 data3 <- data2[data2[, .I[year == min(year)], by=stationcode]$V1]
-View(data3)
+head(data3)
 
-## Change data from long range to wide range: data, key (headers), values
+## Change data from long range to wide range. Arguments after spread function: data, key (headers), values
 library(tidyr)
 names(data3)
 data4 <-spread(data3,sedvar_sievesize,percentage)
-data4
+head(data4)
 
-## Change column order
+## Change column order from large to small sieve size. Remove sample codes.
 names(data4)
 data5 <- data4[,c(2,5,3,4,100:6)]
-data5
+head(data5)
 
-## Change NAs to zero
+## Change NAs to zero so you can sum across columns (to calc % major fractions)
 names(data5)
 data5[, 5:99][is.na(data5[, 5:99])] <- 0
-View(data5)
+head(data5)
 
 ## Add columns for major sediment fractions
 names(data5)
-str(data5)
 data5$cG <- rowSums(data5[,5:21])# 100.427 to 16
 data5$mG <- rowSums(data5[,22:25])# 11.314 to 8
 data5$fG <- rowSums(data5[,26:33])# 6.3 to 2 
@@ -124,12 +123,12 @@ data5$cS <- rowSums(data5[,34:40])# 1.41 to 0.5
 data5$mS <- rowSums(data5[,41:47])# 0.43 to 0.25
 data5$fS <- rowSums(data5[,48:56])# 0.212 to 0.0625 
 data5$SC <- rowSums(data5[,57:99])# 0.0442 to 0 
-data5
+head(data5)
 
-## Get data into final format
+## Take only required columns (stationcode, cG, mG, fG, cS, mS, fS, SC, samplelat, samplelong)
 names(data5)
 data6 <- data5[,c(1,100:106,3,4)]
-data6
+head(data6)
 
 ## Update column names
 colnames(data6)[9] <- "Lat"
@@ -237,7 +236,8 @@ piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
 subreg <- readOGR("DATA/sub_region.shp")
 regions<-readOGR("DATA/regions2.shp")
-ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
+#ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
+ref <- readOGR("DATA/REF_BOX_ALL.shp")
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
@@ -254,10 +254,31 @@ piz@data
 #View(piz@data)
 
 ## Add attributes info for Ref
-ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
-ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
-ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
+#ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
+#ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
+#ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
 #View(ref@data)
+## Plot only ref boxes from WestIOW sub_region
+#ref.wiow <- subset(ref, Sub_Region=="West IOW")
+#plot(ref.wiow)
+
+############################################
+## Add attributes info for Ref
+ref@data$Box=c("Box 6","Box 5","Box 4","Box 3","Box 2","Box 1","Box 4","Box 1","Box 2","Box 3","Box 5","Box 6")
+ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast","Anglian","Anglian","Anglian","Anglian","Anglian","Anglian")
+ref@data$Sub_Region <- c("Hastings","Owers","East IOW","East IOW","East IOW","West IOW","East Anglian","North Anglian","North Anglian","North Anglian","South Anglian","South Anglian")
+View(ref@data)
+
+## Plot only ref boxes from WestIOW sub_region
+ref.wiow <- subset(ref, Sub_Region=="West IOW")
+plot(ref.wiow)
+ref.eiow <- subset(ref, Sub_Region=="East IOW")
+plot(ref.eiow)
+ref.o <- subset(ref, Sub_Region=="Owers")
+plot(ref.o)
+ref.na <- subset(ref, Sub_Region=="North Anglian")
+plot(ref.na)
+############################################
 
 
 
@@ -477,7 +498,11 @@ plot(piz.humins)
 #### 3. IMPORT MONITORING DATA ####
 ## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
 mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
-mondat
+
+## Load A (2018) monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
+#mondat=read.csv("DATA/A_MTEST_MANUAL RESULTS 4 SED CHANGE TOOL.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
+
+head(mondat)
 dim(mondat) #550 10
 
 ## Add col for time (m = Monitoring)
