@@ -726,16 +726,22 @@ data3$site=as.factor(data3$site)
 ## 21/08/2019 pm Get object data3 into sensible order
 ## Reorder rows
 str(data3)
+target <- data3$site
+target
+lev <- levels(target)
+lev
+## Change order of treatments
 ##########################
-## 10/10/2019
-## Get first station code from data3
-#regcode <- data3[1,1]
+## 10/10
+
+## Identify region for monitoring samples. This is done by getting the first letter of the samplecode
 regcode <- substr(data3[1,1],1,1)
 regcode
 
+## Now set the order of treatments using region specific list
 if ( regcode=="A") {
   target <- c("PIZ","SIZ","REF","212 PIZ","212 SIZ","228 PIZ","240 PIZ","240 SIZ","242-361 PIZ","242 PIZ","254 PIZ" ,"254 SIZ","296 PIZ","296 SIZ","328/1 PIZ","328/1 SIZ",   "328/2 PIZ" , "328/2 SIZ",  "328/3 PIZ",           "360 PIZ","360 SIZ","361/1 PIZ","361/2 PIZ", "401/2A PIZ","401/2A SIZ", "401/2B PIZ","401/2B SIZ",  "430 PIZ",    "430 SIZ", "494 PIZ", "494 SIZ",  "495/1 PIZ",   "495/2 PIZ","511 PIZ","512 PIZ",             "512 SIZ",   "513/1 PIZ","513/2 PIZ", "525 SIZ","Anglian Inshore PIZ","Anglian Inshore SIZ","Anglian Offshore PIZ","Anglian Offshore SIZ","Box 1 REF","Box 2 REF", "Box 3 REF", "Box 4 REF","Box 5 REF","Box 6 REF","CONTEXT","East Anglian REF",    "NA CONTEXT","NA PIZ","NA SIZ","North Anglian REF",   "South Anglian REF")
-} else if (regcode=="SC") {
+} else if (regcode=="S") {
   target <- c("PIZ", "SIZ", "REF", "CONTEXT",
               "West IOW PIZ","West IOW SIZ"  ,"West IOW REF"   , "West IOW CONTEXT" ,
               "East IOW PIZ","East IOW SIZ" ,"East IOW REF","East IOW CONTEXT",
@@ -750,95 +756,9 @@ if ( regcode=="A") {
               "488 SIZ" ,"500/3 PIZ","500/3 SIZ","Box 1 REF" ,
               "Box 2 REF","Box 3 REF","Box 4 REF"  ,"Box 5 REF",  
               "Box 6 REF")
-} 
-
+}
 #########################
 
-#target <- data3$site
-target
-#lev <- levels(target)
-lev <- levels(as.factor(target))
-lev
-## Change order of treatments
-
-target <- c("PIZ", "SIZ", "REF", "CONTEXT",
-            "West IOW PIZ","West IOW SIZ"  ,"West IOW REF"   , "West IOW CONTEXT" ,
-            "East IOW PIZ","East IOW SIZ" ,"East IOW REF","East IOW CONTEXT",
-            "Owers PIZ","Owers SIZ","Owers REF","Owers CONTEXT"  , 
-            "Hastings PIZ",  "Hastings SIZ"  ,  "Hastings REF","Hastings CONTEXT", "127 PIZ" ,"127 SIZ", "137 PIZ" , "137 SIZ"  ,
-            "340 PIZ" ,"340 SIZ","351 PIZ"  , "351 SIZ" ,
-            "372/1 PIZ","372/1 SIZ" ,"395/1 PIZ", "395/1 SIZ" ,
-             "395/2 PIZ","395/2 SIZ" ,"396/1 PIZ"  ,"396/1 SIZ",
-            "407 PIZ","407 SIZ","435/1 PIZ","435/1 SIZ",
-            "435/2 PIZ","435/2 SIZ","451 PIZ","451 SIZ",
-            "453 PIZ" ,"460 PIZ","460 SIZ","488 PIZ" ,
-            "488 SIZ" ,"500/3 PIZ","500/3 SIZ","Box 1 REF" ,
-            "Box 2 REF","Box 3 REF","Box 4 REF"  ,"Box 5 REF",  
-             "Box 6 REF")#"Context CONTEXT",
-
-#target <- c("PIZ",
- #           "SIZ",
-  #          "REF",
-   #         
-    #        "West IOW PIZ",
-     #       "West IOW SIZ",
-      #      "West IOW REF",
-            
-            
-#            "East IOW PIZ",
-#            "East IOW SIZ",
-#           "East IOW REF",
-#           "Owers PIZ",
-#           "Owers SIZ",
-#           "Owers REF",
-#           "Hastings PIZ",
-#           "Hastings SIZ",
-#           "Hastings REF",
-#           "127 PIZ",    
-#           "137 PIZ",
-#           "340 PIZ",
-#           "351 PIZ",
-#           "372/1 PIZ",
-#           "395/1 PIZ",
-#           "395/2 PIZ",
-#           "396/1 PIZ",
-#           "407 PIZ",
-#           "435/1 PIZ",
-#           "435/2 PIZ",            
-#           "451 PIZ",
-#           "460 PIZ",
-#           "488 PIZ",
-#           "500/3 PIZ",
-       
-            
-#           "127 SIZ",
-#           "137 SIZ",
-#           "340 SIZ",
-#           "351 SIZ",
-#           "372/1 SIZ",
-#           "395/1 SIZ",
-#           "395/2 SIZ",
-#           "396/1 SIZ",
-#           "407 SIZ",
-#           "435/1 SIZ",
-#           "435/2 SIZ",
-#           "451 SIZ", 
-#           "453 PIZ",
-#           "460 SIZ",
-#           "488 SIZ",
-#           "500/3 SIZ",
-            
-            
-#           "NA REF" , 
-#           "Context REF",
-#           "Box 1 REF", 
-#           "Box 2 REF", 
-#           "Box 3 REF", 
-#           "Box 4 REF", 
-#           "Box 5 REF", 
-#           "Box 6 REF" 
-            
-#)
 
 require(gdata)
 data3$site <- reorder.factor(data3$site, new.order=target)
