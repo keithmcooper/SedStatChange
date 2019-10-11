@@ -238,6 +238,7 @@ subreg <- readOGR("DATA/sub_region.shp")
 regions<-readOGR("DATA/regions2.shp")
 #ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
 ref <- readOGR("DATA/REF_BOX_ALL.shp")
+ref <- readOGR("DATA/A_REF_POLYGONS.shp")
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
@@ -276,8 +277,8 @@ ref.eiow <- subset(ref, Sub_Region=="East IOW")
 plot(ref.eiow)
 ref.o <- subset(ref, Sub_Region=="Owers")
 plot(ref.o)
-ref.na <- subset(ref, Sub_Region=="North Anglian")
-plot(ref.na)
+ref.A <- subset(ref, region=="Anglian")
+plot(ref.A)
 ############################################
 
 
