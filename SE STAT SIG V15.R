@@ -197,10 +197,10 @@ data = dbGetQuery(con, "SELECT
                   samplelong,
                   year
                   FROM
-                  sample,
-                  sedvarsample,
-                  station,
-                  samplestation
+                  samples.sample,
+                  sediment_data.sedvarsample,
+                  associations.station,
+                  associations.samplestation
                   WHERE
                   sample.samplecode=sedvarsample.sample_samplecode
                   AND
