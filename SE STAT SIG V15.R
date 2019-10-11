@@ -187,6 +187,28 @@ names(sample)
 
 plot(sample$samplelong,sample$samplelat)
 
+## Get baseline sediment data from OneBenthic DB
+data = dbGetQuery(con, "SELECT
+                  samplecode,
+                  stationcode,
+                  sedvar_sievesize,
+                  percentage,
+                  samplelat,
+                  samplelong,
+                  year
+                  FROM
+                  sample,
+                  sedvarsample,
+                  station,
+                  samplestation
+                  WHERE
+                  sample.samplecode=sedvarsample.sample_samplecode
+                  AND
+                  sample.samplecode=samplestation.sample_samplecode
+                  AND
+                  samplestation.station_stationcode= station.stationcode")
+
+head(data) # print data
 ###################################################################
 #### IMPORT POLYGONS FROM AWS ####
 #install.packages("RPostgreSQL")
@@ -236,9 +258,8 @@ piz<-readOGR("DATA/piz2.shp")
 siz<-readOGR("DATA/siz2.shp") 
 subreg <- readOGR("DATA/sub_region.shp")
 regions<-readOGR("DATA/regions2.shp")
-#ref <- readOGR("DATA/SC_REF_POLYGONS_REV3.shp")
 ref <- readOGR("DATA/REF_BOX_ALL.shp")
-ref <- readOGR("DATA/A_REF_POLYGONS.shp")
+
 
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
