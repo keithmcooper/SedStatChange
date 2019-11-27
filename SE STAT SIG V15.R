@@ -18,11 +18,12 @@ library(plyr)
 
 ######################################################################
 
-#### TO ACCESS ONEBENTHIC ON MY MACHINE ####
+#### 1. RETRIEVE BASELINE DATA (FROM ONEBENTHIC ON MY MACHINE) ####
 #install.packages("RPostgreSQL")
 #require("RPostgreSQL")
 library ( RPostgres)
 library(DBI)
+
 ## create a connection. Save the password
 pw <- {
   "postgres1234"
@@ -49,7 +50,7 @@ dbExistsTable(con, "taxa") # This table is not in the public scheme
 ## To see a list of all schema
 dbGetQuery(con, "SELECT nspname FROM pg_catalog.pg_namespace")
 
-## List tables in a particular scheme
+## List tables in a particular schema
 dbGetQuery(con,"SELECT table_schema||'.'||table_name AS full_rel_name
 FROM information_schema.tables
 WHERE table_schema = 'faunal_data';")
@@ -138,8 +139,8 @@ names(data6)
 ## Change name of baseline file so it works with code below
 basdat <- data6 
 
-######################################################################
-#### TO ACCESS ONEBENTHIC ON CEFAS SHINY SERVER ####
+
+#### 1. RETRIEVE BASELINE DATA (ONEBENTHIC ON CEFAS SHINY SERVER) ####
 #install.packages("RPostgreSQL")
 #require("RPostgreSQL")
 library ( RPostgres)
@@ -209,8 +210,9 @@ data = dbGetQuery(con, "SELECT
                   samplestation.station_stationcode= station.stationcode")
 
 head(data) # print data
-###################################################################
-#### IMPORT POLYGONS FROM AWS ####
+
+
+#### 2. IMPORT POLYGONS (FROM AWS) ####
 #install.packages("RPostgreSQL")
 require("RPostgreSQL")
 
@@ -251,7 +253,7 @@ writeOGR(obj=regions, ".", layer="DATA/regions2", driver="ESRI Shapefile") #dsn=
 
 
 
-#### 2. IMPORT POLYGONS FROM DATA FOLDER ####
+#### 2. IMPORT POLYGONS (FROM DATA FOLDER) ####
 
 ## Load piz and siz fromm DATA folder
 piz<-readOGR("DATA/piz2.shp")
@@ -286,17 +288,17 @@ piz@data
 
 ############################################
 ## Add attributes info for Ref
-ref@data$Box=c("Box 6","Box 5","Box 4","Box 3","Box 2","Box 1","Box 4","Box 1","Box 2","Box 3","Box 5","Box 6")
-ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast","Anglian","Anglian","Anglian","Anglian","Anglian","Anglian")
-ref@data$Sub_Region <- c("Hastings","Owers","East IOW","East IOW","East IOW","West IOW","East Anglian","North Anglian","North Anglian","North Anglian","South Anglian","South Anglian")
+#ref@data$Box=c("Box 6","Box 5","Box 4","Box 3","Box 2","Box 1","Box 4","Box 1","Box 2","Box 3","Box 5","Box 6")
+#ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast","Anglian","Anglian","Anglian","Anglian","Anglian","Anglian")
+#ref@data$Sub_Region <- c("Hastings","Owers","East IOW","East IOW","East IOW","West IOW","East Anglian","North Anglian","North Anglian","North Anglian","South Anglian","South Anglian")
 View(ref@data)
 
 ## Plot only ref boxes from WestIOW sub_region
-ref.wiow <- subset(ref, Sub_Region=="West IOW")
+ref.wiow <- subset(ref, sub_region=="West IOW")
 plot(ref.wiow)
-ref.eiow <- subset(ref, Sub_Region=="East IOW")
+ref.eiow <- subset(ref, sub_region=="East IOW")
 plot(ref.eiow)
-ref.o <- subset(ref, Sub_Region=="Owers")
+ref.o <- subset(ref, sub_region=="Owers")
 plot(ref.o)
 ref.A <- subset(ref, region=="Anglian")
 plot(ref.A)
