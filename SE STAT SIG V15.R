@@ -583,9 +583,9 @@ sizgis3 <-sizgis2[!sizgis2$Code %in% pizgis2$Code, , drop = FALSE]
 dim(sizgis3)#206
 
 ## Drop non-ref stations
-refgis2 <- refgis[!is.na(refgis$Box),]
+refgis2 <- refgis[!is.na(refgis$box),]
 dim(refgis2)#81
-
+#View(refgis)
 ## Drop non-context stations by removing stations present in piz, siz and ref
 contgis2 <- contgis[!contgis$Code %in% pizgis2$Code, , drop = FALSE]#remove piz stations
 contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove siz stations
@@ -600,13 +600,13 @@ pizgis3 <- pizgis2 [,c(20,4,19,21,5)]
 colnames(pizgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # SIZ
-names(sizgis4)
+names(sizgis3)
 sizgis4 <- sizgis3[,c(20,5,19,21,6)]
 colnames(sizgis4) <- c("Code","Region","Sub_region","Treatment","Area")
 
 # REF
 names(refgis2)
-refgis3 <- refgis2[,c(5,3,4,6,2)]
+refgis3 <- refgis2[,c(5,2,4,6,3)]
 names(refgis3)
 colnames(refgis3) <- c("Code","Region","Sub_region","Treatment","Area")
 #View(refgis3)
