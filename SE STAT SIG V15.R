@@ -1,8 +1,7 @@
 ## added text to show new branch working
+
 ## Set wd
 setwd('C:/Users/kmc00/OneDrive - CEFAS/R_PROJECTS/SedStatChange')
-#getwd()
-
 
 ## Call libraries
 library(dplyr)
@@ -16,11 +15,9 @@ library(rgdal)
 library(maptools)
 library(plyr)
 
-######################################################################
-
 #### 1. RETRIEVE BASELINE DATA (FROM ONEBENTHIC ON MY MACHINE) ####
-#install.packages("RPostgreSQL")
-#require("RPostgreSQL")
+
+## Call libraries
 library ( RPostgres)
 library(DBI)
 
@@ -30,16 +27,16 @@ pw <- {
 }
 logged= FALSE;
 
-## loads the PostgreSQL driver
+## Loads PostgreSQL driver
 drv <- dbDriver("Postgres")
 
-## Creates a connection to the postgres database. Note that "con" will be used later in each connection to the database
+## Creates connection to the Postgres database. Note that "con" will be used later in each connection to the database
 con =  dbConnect(drv, dbname = "OneBenthicDB",
                  host = "localhost",
                  port = 5433,
                  user = "postgres",
                  password = pw)
-rm(pw) # removes the password
+rm(pw) # remove the password
 
 ## See list of tables. Default is for public scheme
 dbListTables(con)
@@ -141,17 +138,18 @@ basdat <- data6
 
 
 #### 1. RETRIEVE BASELINE DATA (ONEBENTHIC ON CEFAS SHINY SERVER) ####
-#install.packages("RPostgreSQL")
-#require("RPostgreSQL")
+
+## Call libraries
 library ( RPostgres)
 library(DBI)
+
 ## create a connection. Save the password
 pw <- {
   "inv@s1ve00!"
 }
 logged= FALSE;
 
-## loads the PostgreSQL driver
+## Loads PostgreSQL driver
 drv <- dbDriver("Postgres")
 
 ## Creates a connection to the postgres database. Note that "con" will be used later in each connection to the database
@@ -165,9 +163,8 @@ rm(pw) # removes the password
 ## See list of tables. Default is for public scheme
 dbListTables(con)
 
-## Does a tabloe exist?
+## Does a table exist?
 dbExistsTable(con, "taxa") # This table is not in the public scheme
-
 
 ## To see a list of all schema
 dbGetQuery(con, "SELECT nspname FROM pg_catalog.pg_namespace")
@@ -189,30 +186,90 @@ names(sample)
 plot(sample$samplelong,sample$samplelat)
 
 ## Get baseline sediment data from OneBenthic DB
-data = dbGetQuery(con, "SELECT
-                  samplecode,
-                  stationcode,
-                  sedvar_sievesize,
-                  percentage,
-                  samplelat,
-                  samplelong,
-                  year
-                  FROM
-                  samples.sample,
-                  sediment_data.sedvarsample,
-                  associations.station,
-                  associations.samplestation
-                  WHERE
-                  sample.samplecode=sedvarsample.sample_samplecode
-                  AND
-                  sample.samplecode=samplestation.sample_samplecode
-                  AND
-                  samplestation.station_stationcode= station.stationcode")
+#data = dbGetQuery(con, "SELECT
+#                  samplecode,
+#                  stationcode,
+#                  sedvar_sievesize,
+#                  percentage,
+#                  samplelat,
+#                  samplelong,
+#                  year
+#                  FROM
+#                  samples.sample,
+#                  sediment_data.sedvarsample,
+#                  associations.station,
+#                  associations.samplestation
+#                  WHERE
+#                  sample.samplecode=sedvarsample.sample_samplecode
+#                  AND
+#                  sample.samplecode=samplestation.sample_samplecode
+#                  AND
+#                  samplestation.station_stationcode= station.stationcode")
+
+data = dbGetQuery(con,"SELECT samst.station_stationcode, sam.samplecode, sam.samplelat, sam.samplelong, sed.sedvar_sievesize, sed.percentage, sam.year
+FROM samples.sample AS sam
+                  INNER JOIN sediment_data.sedvarsample AS sed
+                  ON sam.samplecode = sed.sample_samplecode
+                  INNER JOIN associations.samplestation AS samst
+                  ON sam.samplecode = samst.sample_samplecode
+                  ORDER BY station_stationcode, samplecode, sedvar_sievesize desc;")
 
 head(data) # print data
+dim(data)
+## Convert object 'data' to a data.table
+require(data.table) 
+data2 <- as.data.table(data)
+
+## Query returns all samples associated with an RSMP station. Only keep the true baseline samples (i.e. those with lowest year)
+data3 <- data2[data2[, .I[year == min(year)], by=station_stationcode]$V1]
+head(data3)
+
+## Change data from long range to wide range. Arguments after spread function: data, key (headers), values
+library(tidyr)
+names(data3)
+View(data3[31887:31866,])
+data4 <-spread(data3,sedvar_sievesize,percentage)
+head(data4)
+
+## Change column order from large to small sieve size. Remove sample codes.
+names(data4)
+data5 <- data4[,c(1,5,3,4,101:6)]
+head(data5)
+
+## Change NAs to zero so you can sum across columns (to calc % major fractions)
+names(data5)
+data5[, 5:100][is.na(data5[, 5:100])] <- 0
+head(data5)
+
+## Add columns for major sediment fractions
+names(data5)
+data5$cG <- rowSums(data5[,5:21])# 100.427 to 16
+data5$mG <- rowSums(data5[,22:25])# 11.314 to 8
+data5$fG <- rowSums(data5[,26:33])# 6.3 to 2 
+data5$cS <- rowSums(data5[,34:40])# 1.41 to 0.5
+data5$mS <- rowSums(data5[,41:47])# 0.43 to 0.25
+data5$fS <- rowSums(data5[,48:56])# 0.212 to 0.0625 
+data5$SC <- rowSums(data5[,57:101])# 0.0442 to 0 
+head(data5)
+
+## Take only required columns (stationcode, cG, mG, fG, cS, mS, fS, SC, samplelat, samplelong)
+names(data5)
+data6 <- data5[,c(1,101:107,3,4)]
+head(data6)
+
+## Update column names
+colnames(data6)[1] <- "stationcode"
+colnames(data6)[9] <- "Lat"
+colnames(data6)[10] <- "Long"
+names(data6)
+
+## Change name of baseline file so it works with code below
+basdat <- data6 
+
 
 
 #### 2. IMPORT POLYGONS (FROM AWS) ####
+
 #install.packages("RPostgreSQL")
 require("RPostgreSQL")
 
@@ -262,36 +319,22 @@ subreg <- readOGR("DATA/sub_region.shp")
 regions<-readOGR("DATA/regions2.shp")
 ref <- readOGR("DATA/REF_BOX_ALL.shp")
 
-
 ## Reinstate full column names (these are lost in the writeOGR step)
 names(piz)=c("fid","gid","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","area_shape_km2","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
 names(siz)=c("fid","gid","gid_piz","region","region_name","area_numbe","area_name","sub_type","company","area_shape","perimeter_shape","input_date","replaced","replaced_by","updated","updated_date","droped","droped_date")
 names(regions)=c("region","region_name","area_shape_km2")
 
+## Plot polygons
 plot(piz)
 plot(siz)
 plot(regions)
 plot(ref)
 plot(subreg)
+
 ## To see the attributes data
 piz@data
 #View(piz@data)
-
-## Add attributes info for Ref
-#ref@data$Box=c("Box 1","Box 2","Box 3","Box 4","Box 5","Box 6")
-#ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast")
-#ref@data$Sub_Region <- c("West IOW","East IOW","East IOW","East IOW","Owers","Hastings")
 #View(ref@data)
-## Plot only ref boxes from WestIOW sub_region
-#ref.wiow <- subset(ref, Sub_Region=="West IOW")
-#plot(ref.wiow)
-
-############################################
-## Add attributes info for Ref
-#ref@data$Box=c("Box 6","Box 5","Box 4","Box 3","Box 2","Box 1","Box 4","Box 1","Box 2","Box 3","Box 5","Box 6")
-#ref@data$Region <- c("South Coast","South Coast","South Coast","South Coast","South Coast","South Coast","Anglian","Anglian","Anglian","Anglian","Anglian","Anglian")
-#ref@data$Sub_Region <- c("Hastings","Owers","East IOW","East IOW","East IOW","West IOW","East Anglian","North Anglian","North Anglian","North Anglian","South Anglian","South Anglian")
-View(ref@data)
 
 ## Plot only ref boxes from WestIOW sub_region
 ref.wiow <- subset(ref, sub_region=="West IOW")
@@ -302,9 +345,6 @@ ref.o <- subset(ref, sub_region=="Owers")
 plot(ref.o)
 ref.A <- subset(ref, region=="Anglian")
 plot(ref.A)
-############################################
-
-
 
 ## Add subregion information to attributes table for PIZ
 piz@data$sub_region <- ifelse(piz@data$area_numbe == "501/1"|
@@ -519,11 +559,12 @@ piz.humins <- subset(piz, sub_region=="Humber Inshore")
 plot(piz.humins)
 
 
-#### 3. IMPORT MONITORING DATA ####
-## Load SC monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
-mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 
-## Load A (2018) monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
+
+#### 3. IMPORT MONITORING DATA ####
+
+## Load monitoring data. Proportions of major sediment fractions by RSMP code, with coordinates
+mondat=read.csv("DATA/SCSEDMONDATAINCPOS2017.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 #mondat=read.csv("DATA/A_MTEST_MANUAL RESULTS 4 SED CHANGE TOOL.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 
 head(mondat)
@@ -550,12 +591,44 @@ sizgis=over(pts_m,siz) # SIZ
 contgis=over(pts_m,regions) # CONTEXT
 contsrgis=over(pts_m,subreg)# CONTEXT get sub region
 contgis <- cbind(contgis,contsrgis)# CONTEXT append sub_region
-head(contgis2)
-contgis <- contgis[,c(2,5)]
-
-names(contgis)
+contgis2 <- contgis[,c(2,5)]
+contgis <- contgis2
 refgis=over(pts_m,ref) # REF
 
+##########################################
+# 02/12/2019
+# Polygons
+plot(siz)
+class(siz) #"SpatialPolygonsDataFrame"
+proj4string(siz) #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+
+# Points
+plot(pts_m)
+class(pts_m) #"SpatialPoints"
+pts_m # 550 features
+proj4string(pts_m) #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+# Problem: using over function only gives last polygon
+sizgis=over(pts_m,siz)
+dim(sizgis) # 550  - same as 
+
+## solution to rip the individual polygons out of the SpatialPolygons object and put them in a list, converting the individual polygons into SpatialPolygons along the way:https://gis.stackexchange.com/questions/224265/error-identicalcrsx-y-is-not-true 
+siz2 <- lapply(siz@polygons, function(x) SpatialPolygons(list(x)))
+View(siz2)
+
+#Then lapply-ing over siz2 we can see which polygons each point intersects…
+test <- lapply(siz2, function(x) over(pts_m, x))
+test
+
+siz@proj4string
+pts_m@proj4string
+
+CRS.new<-CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+proj4string(siz) <- CRS.new 
+proj4string(pts_m) <- CRS.new  
+#####################################
 ## Add station codes to extracted data
 stations=mondat[,1]# vector for station codes
 pizgis$Code <- stations
@@ -566,9 +639,10 @@ refgis$Code <- stations
 ## Add Treatment column
 pizgis$Treatment <- "PIZ"
 sizgis$Treatment <- "SIZ"
-#contgis$Treatment <- "REF"
 contgis$Treatment <- "CONTEXT"
 refgis$Treatment <- "REF"
+
+View(sizgis)
 
 ## Remove records from above objects that are not relevant (i.e. not associated with the relevant treatment)
 pizgis2 <- pizgis[!is.na(pizgis$area_numb),] # PIZ, remove NAs
@@ -586,12 +660,13 @@ dim(sizgis3)#206
 refgis2 <- refgis[!is.na(refgis$box),]
 dim(refgis2)#81
 #View(refgis)
+
 ## Drop non-context stations by removing stations present in piz, siz and ref
 contgis2 <- contgis[!contgis$Code %in% pizgis2$Code, , drop = FALSE]#remove piz stations
 contgis3 <- contgis2[!contgis2$Code %in% sizgis3$Code, , drop = FALSE]#remove siz stations
 contgis4 <- contgis3[!contgis3$Code %in% refgis2$Code, , drop = FALSE]#remove ref stations
 dim(contgis4)
-View(contgis4)
+#View(contgis4)
 
 ## Now make sure all GIS query objects have required fields: Code, Region, Sub-region, Treatment, Area
 # PIZ
@@ -616,20 +691,12 @@ names(contgis4)
 #contgis5 <- contgis4[,c(5,2,4,6)]
 contgis5 <- contgis4[,c(3,1,2,4)]
 colnames(contgis5) <- c("Code","Region","Sub_region","Treatment")
-#contgis5$Sub_region <- NA
-#contgis5$Area <- "Context"
 contgis5$Area <- "Ref"
 contgis6=contgis5[,c(1,2,3,4,5)]
-
-names(contgis6)
-dim(contgis6)
-View(contgis6)
 
 ## Fudge to correct region and sub-region info where regions overlap
 contgis6$Region[contgis6$Code=="SC_0265"] <- "South Coast"
 contgis6$Sub_region[contgis6$Code=="SC_0265"] <- "Hastings"
-
-
 
 ## Now bring GIS query objects together
 treatall <- rbind(pizgis3,sizgis4,refgis3,contgis6)
@@ -644,12 +711,8 @@ treatall2=treatall[order(treatall$Code),]
 ## Bring in  SC baseline data and match to monitoring data
 #basdat=read.csv("DATA/SCSEDBASDATAINCPOS.csv",header=T,na.strings=c("NA", "-","?","<null>"),stringsAsFactors=F,check.names=FALSE)
 basdat
-
-View(basdat)
+#View(basdat)
 dim(basdat)# 771  10
-
-
-
 
 ## Add col for 'time' (b = Baseline)
 basdat$time="b"
